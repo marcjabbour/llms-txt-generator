@@ -1,4 +1,4 @@
-const scrapingAgent = require('./scrapingAgent');
+const customScrapingService = require('./customScrapingService');
 const { validateUrl } = require('../../utils/validation');
 
 class ScrapingService {
@@ -14,15 +14,11 @@ class ScrapingService {
 
       this.activeJobs.set(jobId, { status: 'running', startTime: Date.now() });
 
-      const result = await scrapingAgent.scrape(url, options);
+      // Use custom scraping service
+      const result = await customScrapingService.scrapeAndGenerate(url, options);
 
       this.activeJobs.delete(jobId);
-      
-      return {
-        success: true,
-        data: result,
-        scrapedAt: new Date().toISOString()
-      };
+      return result;
 
     } catch (error) {
       this.activeJobs.delete(jobId);
@@ -41,6 +37,7 @@ class ScrapingService {
     }
     return false;
   }
+
 }
 
 module.exports = new ScrapingService();

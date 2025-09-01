@@ -6,12 +6,10 @@ class ScrapingService {
       const response = await ApiService.post('/api/generate', {
         url,
         options: {
-          method: options.useDynamicScraping ? 'dynamic' : 'static',
-          waitFor: options.waitTime || 0,
-          extractText: true,
-          extractLinks: options.extractLinks || false,
-          extractImages: options.extractImages || false,
-          selectors: options.customSelectors || {},
+          maxPages: options.maxPages || 50,
+          maxDepth: options.maxDepth || 3,
+          generateFullText: options.generateFullText !== false,
+          followLinks: options.followLinks !== false,
         },
       });
 
@@ -56,6 +54,56 @@ class ScrapingService {
 
       checkStatus();
     });
+  }
+
+  async downloadLlmsFile(jobId) {
+    try {
+      const response = await fetch(`/api/generate/download/${jobId}/llms.txt`);
+      
+      if (!response.ok) {
+        throw new Error(`Download failed: ${response.statusText}`);
+      }
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = response.headers.get('Content-Disposition')?.split('filename=')[1]?.replace(/"/g, '') || 'llms.txt';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+      
+      return true;
+    } catch (error) {
+      console.error('Failed to download LLMS file:', error);
+      throw new Error(`Failed to download LLMS file: ${error.message}`);
+    }
+  }
+
+  async downloadLlmsFullFile(jobId) {
+    try {
+      const response = await fetch(`/api/generate/download/${jobId}/llms-full.txt`);
+      
+      if (!response.ok) {
+        throw new Error(`Download failed: ${response.statusText}`);
+      }
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = response.headers.get('Content-Disposition')?.split('filename=')[1]?.replace(/"/g, '') || 'llms-full.txt';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+      
+      return true;
+    } catch (error) {
+      console.error('Failed to download LLMS full file:', error);
+      throw new Error(`Failed to download LLMS full file: ${error.message}`);
+    }
   }
 
   async healthCheck() {

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import scrapingService from '../services/scrapingService';
 
 const GeneratedFiles = () => {
   const navigate = useNavigate();
@@ -47,38 +48,84 @@ const GeneratedFiles = () => {
     navigate('/');
   };
 
-  const handleDownload = (file) => {
+  const handleDownloadLlms = async (file) => {
+    try {
+      await scrapingService.downloadLlmsFile(file.id);
+    } catch (error) {
+      console.error('Download failed:', error);
+      // Fallback to old method if new API fails
+      handleDownloadFallback(file, 'llms');
+    }
+  };
+
+  const handleDownloadLlmsFull = async (file) => {
+    try {
+      await scrapingService.downloadLlmsFullFile(file.id);
+    } catch (error) {
+      console.error('Download failed:', error);
+      // Fallback to old method if new API fails
+      handleDownloadFallback(file, 'full');
+    }
+  };
+
+  const handleDownloadFallback = (file, type = 'llms') => {
     if (!file.result) {
       console.error('No content available for download');
       return;
     }
 
-    const content = `# ${file.domain}\n\n## URL\n${file.url}\n\n## Content\n${file.result.text || 'No text content extracted'}\n\n## Generated\n${file.createdAt}`;
+    let content;
+    let filename;
+    
+    if (type === 'full' && file.result.data?.llmsFullContent) {
+      content = file.result.data.llmsFullContent;
+      filename = `${file.domain}-llms-full.txt`;
+    } else if (file.result.data?.llmsContent) {
+      content = file.result.data.llmsContent;
+      filename = `${file.domain}-llms.txt`;
+    } else {
+      // Legacy format fallback
+      content = `# ${file.domain}\n\n## URL\n${file.url}\n\n## Content\n${file.result.text || 'No text content extracted'}\n\n## Generated\n${file.createdAt}`;
+      filename = `${file.domain}-llms.txt`;
+    }
     
     const blob = new Blob([content], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${file.domain}-llms.txt`;
+    a.download = filename;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };
 
-  const handleView = (file) => {
+  const handleView = (file, type = 'llms') => {
     if (!file.result) {
       console.error('No content available to view');
       return;
     }
 
-    const content = `URL: ${file.url}\nGenerated: ${file.createdAt}\n\n${file.result.text || 'No text content extracted'}`;
+    let content;
+    let title;
+    
+    if (type === 'full' && file.result.data?.llmsFullContent) {
+      content = file.result.data.llmsFullContent;
+      title = `${file.domain} - llms-full.txt`;
+    } else if (file.result.data?.llmsContent) {
+      content = file.result.data.llmsContent;
+      title = `${file.domain} - llms.txt`;
+    } else {
+      // Legacy format fallback
+      content = `URL: ${file.url}\nGenerated: ${file.createdAt}\n\n${file.result.text || 'No text content extracted'}`;
+      title = `${file.domain} - llms.txt`;
+    }
     
     // Open in a new window/tab for viewing
     const newWindow = window.open('');
     newWindow.document.write(`
       <html>
-        <head><title>${file.domain} - llms.txt</title></head>
+        <head><title>${title}</title></head>
         <body style="font-family: monospace; white-space: pre-wrap; padding: 20px;">
           ${content.replace(/\n/g, '<br>')}
         </body>
@@ -122,18 +169,38 @@ const GeneratedFiles = () => {
                     </span>
                   </div>
                   <div className="file-actions">
-                    <button 
-                      onClick={() => handleView(file)}
-                      className="view-btn"
-                    >
-                      View
-                    </button>
-                    <button 
-                      onClick={() => handleDownload(file)}
-                      className="download-btn"
-                    >
-                      Download
-                    </button>
+                    <div className="action-group">
+                      <span className="action-label">LLMS.txt:</span>
+                      <button 
+                        onClick={() => handleView(file, 'llms')}
+                        className="view-btn small"
+                      >
+                        View
+                      </button>
+                      <button 
+                        onClick={() => handleDownloadLlms(file)}
+                        className="download-btn small"
+                      >
+                        Download
+                      </button>
+                    </div>
+                    {file.result?.data?.llmsFullContent && (
+                      <div className="action-group">
+                        <span className="action-label">LLMS-Full.txt:</span>
+                        <button 
+                          onClick={() => handleView(file, 'full')}
+                          className="view-btn small"
+                        >
+                          View
+                        </button>
+                        <button 
+                          onClick={() => handleDownloadLlmsFull(file)}
+                          className="download-btn small"
+                        >
+                          Download
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
