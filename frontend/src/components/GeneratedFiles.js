@@ -48,23 +48,12 @@ const GeneratedFiles = () => {
     navigate('/');
   };
 
-  const handleDownloadLlms = async (file) => {
+  const handleDownload = async (file, type = 'llms') => {
     try {
-      await scrapingService.downloadLlmsFile(file.id);
+      await scrapingService.download(file.id, type);
     } catch (error) {
       console.error('Download failed:', error);
-      // Fallback to old method if new API fails
-      handleDownloadFallback(file, 'llms');
-    }
-  };
-
-  const handleDownloadLlmsFull = async (file) => {
-    try {
-      await scrapingService.downloadLlmsFullFile(file.id);
-    } catch (error) {
-      console.error('Download failed:', error);
-      // Fallback to old method if new API fails
-      handleDownloadFallback(file, 'full');
+      handleDownloadFallback(file, type);
     }
   };
 
@@ -178,7 +167,7 @@ const GeneratedFiles = () => {
                         View
                       </button>
                       <button 
-                        onClick={() => handleDownloadLlms(file)}
+                        onClick={() => handleDownload(file, 'llms')}
                         className="download-btn small"
                       >
                         Download
@@ -194,7 +183,7 @@ const GeneratedFiles = () => {
                           View
                         </button>
                         <button 
-                          onClick={() => handleDownloadLlmsFull(file)}
+                          onClick={() => handleDownload(file, 'full')}
                           className="download-btn small"
                         >
                           Download

@@ -1,109 +1,45 @@
 import ApiService from './api';
 
 class ScrapingService {
-  async startGeneration(url, options = {}) {
-    try {
-      const response = await ApiService.post('/api/generate', {
-        url,
-        options: {
-          maxPages: options.maxPages || 50,
-          maxDepth: options.maxDepth || 3,
-          generateFullText: options.generateFullText !== false,
-          followLinks: options.followLinks !== false,
-        },
-      });
-
-      return response;
-    } catch (error) {
-      console.error('Failed to start generation:', error);
-      throw new Error(`Failed to start generation: ${error.message}`);
-    }
+  async generate(url, options = {}) {
+    const response = await ApiService.post('/api/generate', { url, options });
+    return response;
   }
 
-  async getGenerationStatus(jobId) {
-    try {
-      const response = await ApiService.get(`/api/generate/status/${jobId}`);
-      return response;
-    } catch (error) {
-      console.error('Failed to get generation status:', error);
-      throw new Error(`Failed to get generation status: ${error.message}`);
-    }
+  async getStatus(jobId) {
+    return await ApiService.get(`/api/generate/status/${jobId}`);
   }
 
-  async pollForCompletion(jobId, onUpdate = null) {
+  async waitForCompletion(jobId, onUpdate) {
     return new Promise((resolve, reject) => {
-      const checkStatus = async () => {
+      const check = async () => {
         try {
-          const status = await this.getGenerationStatus(jobId);
+          const status = await this.getStatus(jobId);
+          onUpdate?.(status);
           
-          if (onUpdate) {
-            onUpdate(status);
-          }
-
-          if (status.status === 'completed') {
-            resolve(status);
-          } else if (status.status === 'failed') {
-            reject(new Error(status.error || 'Generation failed'));
-          } else {
-            setTimeout(checkStatus, 1000);
-          }
+          if (status.status === 'completed') resolve(status);
+          else if (status.status === 'failed') reject(new Error(status.error));
+          else setTimeout(check, 1000);
         } catch (error) {
           reject(error);
         }
       };
-
-      checkStatus();
+      check();
     });
   }
 
-  async downloadLlmsFile(jobId) {
-    try {
-      const response = await fetch(`/api/generate/download/${jobId}/llms.txt`);
-      
-      if (!response.ok) {
-        throw new Error(`Download failed: ${response.statusText}`);
-      }
-      
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = response.headers.get('Content-Disposition')?.split('filename=')[1]?.replace(/"/g, '') || 'llms.txt';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-      
-      return true;
-    } catch (error) {
-      console.error('Failed to download LLMS file:', error);
-      throw new Error(`Failed to download LLMS file: ${error.message}`);
-    }
-  }
-
-  async downloadLlmsFullFile(jobId) {
-    try {
-      const response = await fetch(`/api/generate/download/${jobId}/llms-full.txt`);
-      
-      if (!response.ok) {
-        throw new Error(`Download failed: ${response.statusText}`);
-      }
-      
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = response.headers.get('Content-Disposition')?.split('filename=')[1]?.replace(/"/g, '') || 'llms-full.txt';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-      
-      return true;
-    } catch (error) {
-      console.error('Failed to download LLMS full file:', error);
-      throw new Error(`Failed to download LLMS full file: ${error.message}`);
-    }
+  async download(jobId, type = 'llms') {
+    const url = `/api/generate/download/${jobId}/${type === 'full' ? 'llms-full.txt' : 'llms.txt'}`;
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`Download failed: ${response.statusText}`);
+    
+    const blob = await response.blob();
+    const downloadUrl = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = downloadUrl;
+    a.download = response.headers.get('Content-Disposition')?.split('filename=')[1]?.replace(/"/g, '') || `${type}.txt`;
+    a.click();
+    window.URL.revokeObjectURL(downloadUrl);
   }
 
   async healthCheck() {
@@ -111,7 +47,6 @@ class ScrapingService {
       const response = await ApiService.get('/health');
       return response.status === 'OK';
     } catch (error) {
-      console.error('Health check failed:', error);
       return false;
     }
   }

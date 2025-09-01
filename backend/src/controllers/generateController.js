@@ -1,4 +1,4 @@
-const scrapingService = require('../services/scraping/scrapingService');
+const scraper = require('../services/scraper');
 const { v4: uuidv4 } = require('uuid');
 
 const jobs = new Map();
@@ -21,7 +21,7 @@ const handleGenerate = async (req, res) => {
       options
     });
 
-    scrapingService.startScraping(jobId, url, options)
+    scraper.scrape(url, options)
       .then(result => {
         jobs.set(jobId, {
           ...jobs.get(jobId),

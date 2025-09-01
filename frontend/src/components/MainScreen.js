@@ -15,14 +15,10 @@ const MainScreen = ({ isBackendHealthy }) => {
     setError(null);
 
     try {
-      const jobResponse = await scrapingService.startGeneration(url);
-      console.log('Generation started:', jobResponse);
-
-      const result = await scrapingService.pollForCompletion(
+      const jobResponse = await scrapingService.generate(url);
+      const result = await scrapingService.waitForCompletion(
         jobResponse.jobId,
-        (status) => {
-          console.log('Generation status:', status.status);
-        }
+        (status) => console.log('Status:', status.status)
       );
 
       console.log('Generation completed:', result);
