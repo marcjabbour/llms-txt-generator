@@ -159,7 +159,7 @@ const GeneratedFiles = () => {
                   </div>
                   <div className="file-actions">
                     <div className="action-group">
-                      <span className="action-label">LLMS.txt:</span>
+                      <span className="action-label">llms.txt:</span>
                       <button 
                         onClick={() => handleView(file, 'llms')}
                         className="view-btn small"
@@ -175,7 +175,7 @@ const GeneratedFiles = () => {
                     </div>
                     {file.result?.data?.llmsFullContent && (
                       <div className="action-group">
-                        <span className="action-label">LLMS-Full.txt:</span>
+                        <span className="action-label">llms-full.txt:</span>
                         <button 
                           onClick={() => handleView(file, 'full')}
                           className="view-btn small"
