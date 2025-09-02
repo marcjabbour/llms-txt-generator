@@ -1,28 +1,35 @@
-import { PlaywrightCrawler } from 'crawlee';
+import { PlaywrightCrawler, Configuration } from 'crawlee';
 import { validateUrl } from '../utils/validation.js';
 import contentProcessor from './contentProcessor.js';
 import llmsTxtGenerator from './llmsTxtGenerator.js';
+import { randomUUID } from 'crypto';
+import { fileURLToPath } from 'url';
+import path from 'path';
+import { rm } from 'fs/promises';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 class Scraper {
-  constructor() {
-    this.results = new Map();
-  }
-
-  async scrape(startUrl, options = {}) {
-    if (!validateUrl(startUrl)) {
+  async scrape(url, options = {}) {
+    if (!validateUrl(url)) {
       throw new Error('Invalid URL provided');
     }
 
-    // Reset results for new scraping session
-    this.results.clear();
+    const { maxPages = 50, maxDepth = 3, generateFullText = true } = options;
+
+    // Create unique storage directory for this crawl session
+    const sessionId = randomUUID();
+    const storageDir = path.join(__dirname, '../../storage', sessionId);
     
-    const {
-      maxPages = 50,
-      maxDepth = 3,
-      sameDomain = true
-    } = options;
+    console.log(`Using unique storage directory: ${storageDir}`);
     
-    console.log(`Scraper config: maxPages=${maxPages}, maxDepth=${maxDepth}, sameDomain=${sameDomain}`);
+    // Configure Crawlee with isolated storage for this session
+    const config = new Configuration({
+      storageClientOptions: {
+        localDataDirectory: storageDir
+      }
+    });
 
     const pages = [];
     const seenCanonical = new Set();
@@ -223,7 +230,7 @@ class Scraper {
           success: false
         });
       },
-    });
+    }, config);
 
     // Start crawling
     console.log(`Starting crawler with startUrl: ${startUrl}`);
@@ -233,6 +240,14 @@ class Scraper {
     }]);
     
     console.log(`Crawler finished. Total pages processed: ${this.results.size}`);
+
+    // Clean up the temporary storage directory
+    try {
+      await rm(storageDir, { recursive: true, force: true });
+      console.log(`Cleaned up storage directory: ${storageDir}`);
+    } catch (error) {
+      console.warn(`Failed to clean up storage directory: ${error.message}`);
+    }
 
     // Convert results to array and generate consolidated data
     const pagesData = Array.from(this.results.values());
@@ -248,58 +263,31 @@ class Scraper {
     };
   }
 
-  shouldSkipUrl(url) {
-    const skipPatterns = [
-      /\/search\?/i,
-      /\/admin/i,
-      /\/wp-admin/i,
-      /\/logout$/i,
-      /^mailto:/i,
-      /^tel:/i,
-      /^ftp:/i,
-      /#$/,
-    ];
+  generateFull(pages, baseUrl) {
+    const domain = new URL(baseUrl).hostname;
+    let content = `# ${domain} - Full Content\n\n`;
 
-    return skipPatterns.some(pattern => pattern.test(url));
+    pages.forEach(page => {
+      if (page.content?.trim()) {
+        content += `## ${page.title}\n`;
+        content += `URL: ${page.url}\n\n`;
+        content += `${page.content}\n\n---\n\n`;
+      }
+    });
+
+    return content;
   }
 
-  async consolidateData(pagesData, startUrl) {
-    const successfulPages = pagesData.filter(page => page.success);
-    const domain = new URL(startUrl).hostname;
-    
-    console.log(`Processing ${successfulPages.length} pages with AI analysis...`);
-    
-    // Process pages with LLM analysis
-    const processedPages = await contentProcessor.processPages(successfulPages);
-    
-    console.log(`Generating site description for ${domain}...`);
-    
-    // Generate site description
-    const siteDescription = await contentProcessor.generateSiteDescription(domain, processedPages);
-    
-    console.log(`Generating structured llms.txt content...`);
-    
-    // Generate structured content
-    const llmsContent = llmsTxtGenerator.generateStructuredContent(
-      domain, 
-      siteDescription, 
-      processedPages
-    );
-    
-    // Generate summary statistics
-    const summaryStats = llmsTxtGenerator.generateSummaryStats(processedPages);
+  truncate(text, maxLength) {
+    if (!text || text.length <= maxLength) return text;
+    const truncated = text.substring(0, maxLength);
+    const lastSpace = truncated.lastIndexOf(' ');
+    return (lastSpace > maxLength * 0.8 ? truncated.substring(0, lastSpace) : truncated) + '...';
+  }
 
-    return {
-      llmsContent,
-      summary: {
-        ...summaryStats,
-        domains: [...new Set(processedPages.map(page => page.domain))],
-        paths: processedPages.map(page => page.path),
-        siteDescription,
-        aiProcessed: true
-      }
-    };
+  countWords(text) {
+    return text ? text.trim().split(/\s+/).filter(w => w.length > 0).length : 0;
   }
 }
 
-export default new Scraper();
+module.exports = new Scraper();
