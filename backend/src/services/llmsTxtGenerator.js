@@ -15,38 +15,33 @@ class LlmsTxtGenerator {
     let content = `# ${domain}\n\n`;
     content += `> ${siteDescription}\n\n`;
 
+    // Sort categories by importance and page count
+    const sortedCategories = Object.entries(categorizedPages)
+      .filter(([_, pages]) => pages.length > 0)
+      .sort(([categoryA, pagesA], [categoryB, pagesB]) => {
+        // Prioritize certain categories if they exist
+        const importantCategories = ['Home', 'Products', 'Features', 'Services', 'Blog', 'Guides', 'Documentation'];
+        const aImportant = importantCategories.indexOf(categoryA);
+        const bImportant = importantCategories.indexOf(categoryB);
+        
+        if (aImportant !== -1 && bImportant !== -1) {
+          return aImportant - bImportant; // Both important, use predefined order
+        }
+        if (aImportant !== -1) return -1; // A is important, B is not
+        if (bImportant !== -1) return 1;  // B is important, A is not
+        
+        // Neither is in important list, sort by page count (descending)
+        if (pagesB.length !== pagesA.length) {
+          return pagesB.length - pagesA.length;
+        }
+        
+        // Same page count, sort alphabetically
+        return categoryA.localeCompare(categoryB);
+      });
+
     // Add each category section
-    const categoryOrder = [
-      'Blog',
-      'Guides', 
-      'Features',
-      'Products',
-      'Services',
-      'Customers',
-      'About',
-      'Careers',
-      'Support',
-      'Documentation',
-      'Pricing',
-      'Contact',
-      'Login',
-      'Registration',
-      'Privacy Policy',
-      'Terms',
-      'General'
-    ];
-
-    for (const category of categoryOrder) {
-      if (categorizedPages[category] && categorizedPages[category].length > 0) {
-        content += this.generateCategorySection(category, categorizedPages[category]);
-      }
-    }
-
-    // Add any remaining categories not in the predefined order
-    for (const [category, pages] of Object.entries(categorizedPages)) {
-      if (!categoryOrder.includes(category) && pages.length > 0) {
-        content += this.generateCategorySection(category, pages);
-      }
+    for (const [category, pages] of sortedCategories) {
+      content += this.generateCategorySection(category, pages);
     }
 
     return content.trim();

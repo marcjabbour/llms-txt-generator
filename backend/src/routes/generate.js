@@ -8,5 +8,6 @@ router.post('/', handleGenerate);
 router.get('/status/:jobId', getGenerateStatus);
 
 router.get('/download/:jobId/llms.txt', downloadLlmsFile);
+router.get('/download/:jobId/llms-full.txt', downloadLlmsFile);
 
 export default router;

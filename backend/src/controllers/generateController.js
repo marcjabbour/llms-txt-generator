@@ -72,6 +72,7 @@ const downloadLlmsFile = async (req, res) => {
   try {
     const { jobId } = req.params;
     const job = jobs.get(jobId);
+    const isFullFile = req.path.includes('llms-full.txt');
 
     if (!job) {
       return res.status(404).json({ error: 'Job not found' });
@@ -81,16 +82,22 @@ const downloadLlmsFile = async (req, res) => {
       return res.status(400).json({ error: 'Job not completed yet' });
     }
 
-    if (!job.result?.data?.llmsContent) {
+    let content, filename;
+    const domain = job.url ? new URL(job.url).hostname : 'website';
+    
+    if (isFullFile && job.result?.data?.llmsFullContent) {
+      content = job.result.data.llmsFullContent;
+      filename = `${domain}-llms-full.txt`;
+    } else if (job.result?.data?.llmsContent) {
+      content = job.result.data.llmsContent;
+      filename = `${domain}-llms.txt`;
+    } else {
       return res.status(404).json({ error: 'LLMS content not available' });
     }
-
-    const domain = job.url ? new URL(job.url).hostname : 'website';
-    const filename = `${domain}-llms.txt`;
     
     res.setHeader('Content-Type', 'text/plain');
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-    res.send(job.result.data.llmsContent);
+    res.send(content);
 
   } catch (error) {
     console.error('Error in downloadLlmsFile:', error);

@@ -28,9 +28,18 @@ const GeneratedFiles = () => {
       );
       
       if (!fileExists) {
-        const updatedFiles = [newFile, ...savedFiles];
-        setFiles(updatedFiles);
-        localStorage.setItem('generatedFiles', JSON.stringify(updatedFiles));
+        const fileToStore = {
+          ...newFile,
+          result: undefined // Don't store large content in localStorage
+        };
+        const updatedFiles = [fileToStore, ...savedFiles];
+        setFiles([newFile, ...savedFiles]); // Keep full data in state
+        try {
+          localStorage.setItem('generatedFiles', JSON.stringify(updatedFiles));
+        } catch (error) {
+          console.warn('Failed to save to localStorage:', error);
+          // Continue without saving to localStorage
+        }
       } else {
         setFiles(savedFiles);
       }

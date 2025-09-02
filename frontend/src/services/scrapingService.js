@@ -29,7 +29,8 @@ class ScrapingService {
   }
 
   async download(jobId, type = 'llms') {
-    const url = `/api/generate/download/${jobId}/${type === 'full' ? 'llms-full.txt' : 'llms.txt'}`;
+    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:3001';
+    const url = `${API_BASE_URL}/api/generate/download/${jobId}/llms.txt`;
     const response = await fetch(url);
     if (!response.ok) throw new Error(`Download failed: ${response.statusText}`);
     
@@ -37,7 +38,7 @@ class ScrapingService {
     const downloadUrl = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = downloadUrl;
-    a.download = response.headers.get('Content-Disposition')?.split('filename=')[1]?.replace(/"/g, '') || `${type}.txt`;
+    a.download = response.headers.get('Content-Disposition')?.split('filename=')[1]?.replace(/"/g, '') || 'llms.txt';
     a.click();
     window.URL.revokeObjectURL(downloadUrl);
   }
