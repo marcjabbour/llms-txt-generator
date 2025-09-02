@@ -1,9 +1,0 @@
-{
-	"id": "8QpLyDWPiS0IefU",
-	"json": "{\"id\":\"8QpLyDWPiS0IefU\",\"url\":\"https://www.tryprofound.com/careers/implementation-manager\",\"loadedUrl\":\"https://www.tryprofound.com/careers/implementation-manager\",\"uniqueKey\":\"https://www.tryprofound.com/careers/implementation-manager\",\"method\":\"GET\",\"noRetry\":false,\"retryCount\":0,\"errorMessages\":[],\"headers\":{},\"userData\":{\"depth\":2,\"__crawlee\":{\"enqueueStrategy\":\"same-domain\",\"state\":4}},\"handledAt\":\"2025-09-02T21:18:10.721Z\"}",
-	"method": "GET",
-	"orderNo": null,
-	"retryCount": 0,
-	"uniqueKey": "https://www.tryprofound.com/careers/implementation-manager",
-	"url": "https://www.tryprofound.com/careers/implementation-manager"
-}

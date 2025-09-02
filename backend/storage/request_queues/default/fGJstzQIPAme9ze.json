@@ -1,9 +1,0 @@
-{
-	"id": "fGJstzQIPAme9ze",
-	"json": "{\"id\":\"fGJstzQIPAme9ze\",\"url\":\"https://www.tryprofound.com/customers/lake-com\",\"loadedUrl\":\"https://www.tryprofound.com/customers/lake-com\",\"uniqueKey\":\"https://www.tryprofound.com/customers/lake-com\",\"method\":\"GET\",\"noRetry\":false,\"retryCount\":0,\"errorMessages\":[],\"headers\":{},\"userData\":{\"depth\":2,\"__crawlee\":{\"enqueueStrategy\":\"same-domain\",\"state\":4}},\"handledAt\":\"2025-09-02T21:18:13.096Z\"}",
-	"method": "GET",
-	"orderNo": null,
-	"retryCount": 0,
-	"uniqueKey": "https://www.tryprofound.com/customers/lake-com",
-	"url": "https://www.tryprofound.com/customers/lake-com"
-}

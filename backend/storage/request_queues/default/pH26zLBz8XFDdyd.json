@@ -1,9 +1,0 @@
-{
-	"id": "pH26zLBz8XFDdyd",
-	"json": "{\"id\":\"pH26zLBz8XFDdyd\",\"url\":\"https://www.tryprofound.com/careers?department=AI%20Strategy%20&%20Research\",\"loadedUrl\":\"https://www.tryprofound.com/careers?department=AI%20Strategy%20&%20Research\",\"uniqueKey\":\"https://www.tryprofound.com/careers?+Research=&department=AI+Strategy+\",\"method\":\"GET\",\"noRetry\":false,\"retryCount\":0,\"errorMessages\":[],\"headers\":{},\"userData\":{\"depth\":2,\"__crawlee\":{\"enqueueStrategy\":\"same-domain\",\"state\":4}},\"handledAt\":\"2025-09-02T21:18:06.671Z\"}",
-	"method": "GET",
-	"orderNo": null,
-	"retryCount": 0,
-	"uniqueKey": "https://www.tryprofound.com/careers?+Research=&department=AI+Strategy+",
-	"url": "https://www.tryprofound.com/careers?department=AI%20Strategy%20&%20Research"
-}

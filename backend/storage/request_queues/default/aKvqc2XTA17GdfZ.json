@@ -1,9 +1,0 @@
-{
-	"id": "aKvqc2XTA17GdfZ",
-	"json": "{\"id\":\"aKvqc2XTA17GdfZ\",\"url\":\"https://docs.tryprofound.com/login?redirect=/agent-analytics/faq\",\"loadedUrl\":\"https://docs.tryprofound.com/login?redirect=/agent-analytics/faq\",\"uniqueKey\":\"https://docs.tryprofound.com/login?redirect=%2Fagent-analytics%2Ffaq\",\"method\":\"GET\",\"noRetry\":false,\"retryCount\":0,\"errorMessages\":[],\"headers\":{},\"userData\":{\"depth\":3,\"__crawlee\":{\"enqueueStrategy\":\"same-domain\",\"state\":4}},\"handledAt\":\"2025-09-02T21:18:18.547Z\"}",
-	"method": "GET",
-	"orderNo": null,
-	"retryCount": 0,
-	"uniqueKey": "https://docs.tryprofound.com/login?redirect=%2Fagent-analytics%2Ffaq",
-	"url": "https://docs.tryprofound.com/login?redirect=/agent-analytics/faq"
-}

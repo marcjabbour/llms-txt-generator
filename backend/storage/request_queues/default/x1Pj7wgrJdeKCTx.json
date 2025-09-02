@@ -1,9 +1,0 @@
-{
-	"id": "x1Pj7wgrJdeKCTx",
-	"json": "{\"id\":\"x1Pj7wgrJdeKCTx\",\"url\":\"https://www.tryprofound.com/blog/chatgpt-shopping\",\"loadedUrl\":\"https://www.tryprofound.com/blog/chatgpt-shopping\",\"uniqueKey\":\"https://www.tryprofound.com/blog/chatgpt-shopping\",\"method\":\"GET\",\"noRetry\":false,\"retryCount\":0,\"errorMessages\":[],\"headers\":{},\"userData\":{\"depth\":2,\"__crawlee\":{\"enqueueStrategy\":\"same-domain\",\"state\":4}},\"handledAt\":\"2025-09-02T21:18:13.611Z\"}",
-	"method": "GET",
-	"orderNo": null,
-	"retryCount": 0,
-	"uniqueKey": "https://www.tryprofound.com/blog/chatgpt-shopping",
-	"url": "https://www.tryprofound.com/blog/chatgpt-shopping"
-}

@@ -1,9 +1,0 @@
-{
-	"id": "sjlWFz4wPJE2gSP",
-	"json": "{\"id\":\"sjlWFz4wPJE2gSP\",\"url\":\"https://www.tryprofound.com/careers?department=Growth\",\"loadedUrl\":\"https://www.tryprofound.com/careers?department=Growth\",\"uniqueKey\":\"https://www.tryprofound.com/careers?department=Growth\",\"method\":\"GET\",\"noRetry\":false,\"retryCount\":0,\"errorMessages\":[],\"headers\":{},\"userData\":{\"depth\":2,\"__crawlee\":{\"enqueueStrategy\":\"same-domain\",\"state\":4}},\"handledAt\":\"2025-09-02T21:18:06.794Z\"}",
-	"method": "GET",
-	"orderNo": null,
-	"retryCount": 0,
-	"uniqueKey": "https://www.tryprofound.com/careers?department=Growth",
-	"url": "https://www.tryprofound.com/careers?department=Growth"
-}

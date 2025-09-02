@@ -1,9 +1,0 @@
-{
-	"id": "rlV1X2SGahz0bDz",
-	"json": "{\"id\":\"rlV1X2SGahz0bDz\",\"url\":\"https://www.tryprofound.com/zeroclick\",\"loadedUrl\":\"https://www.tryprofound.com/zeroclick\",\"uniqueKey\":\"https://www.tryprofound.com/zeroclick\",\"method\":\"GET\",\"noRetry\":false,\"retryCount\":0,\"errorMessages\":[],\"headers\":{},\"userData\":{\"depth\":1,\"__crawlee\":{\"enqueueStrategy\":\"same-domain\",\"state\":4}},\"handledAt\":\"2025-09-02T21:18:03.489Z\"}",
-	"method": "GET",
-	"orderNo": null,
-	"retryCount": 0,
-	"uniqueKey": "https://www.tryprofound.com/zeroclick",
-	"url": "https://www.tryprofound.com/zeroclick"
-}

@@ -1,9 +1,0 @@
-{
-	"id": "8VcqdpfpIgPCkfu",
-	"json": "{\"id\":\"8VcqdpfpIgPCkfu\",\"url\":\"https://www.tryprofound.com/careers?department=People\",\"loadedUrl\":\"https://www.tryprofound.com/careers?department=People\",\"uniqueKey\":\"https://www.tryprofound.com/careers?department=People\",\"method\":\"GET\",\"noRetry\":false,\"retryCount\":0,\"errorMessages\":[],\"headers\":{},\"userData\":{\"depth\":2,\"__crawlee\":{\"enqueueStrategy\":\"same-domain\",\"state\":4}},\"handledAt\":\"2025-09-02T21:18:08.120Z\"}",
-	"method": "GET",
-	"orderNo": null,
-	"retryCount": 0,
-	"uniqueKey": "https://www.tryprofound.com/careers?department=People",
-	"url": "https://www.tryprofound.com/careers?department=People"
-}

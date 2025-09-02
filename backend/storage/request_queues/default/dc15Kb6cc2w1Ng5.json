@@ -1,9 +1,0 @@
-{
-	"id": "dc15Kb6cc2w1Ng5",
-	"json": "{\"id\":\"dc15Kb6cc2w1Ng5\",\"url\":\"https://www.tryprofound.com/careers/software-engineer-full-stack\",\"loadedUrl\":\"https://www.tryprofound.com/careers/software-engineer-full-stack\",\"uniqueKey\":\"https://www.tryprofound.com/careers/software-engineer-full-stack\",\"method\":\"GET\",\"noRetry\":false,\"retryCount\":0,\"errorMessages\":[],\"headers\":{},\"userData\":{\"depth\":2,\"__crawlee\":{\"enqueueStrategy\":\"same-domain\",\"state\":4}},\"handledAt\":\"2025-09-02T21:18:08.509Z\"}",
-	"method": "GET",
-	"orderNo": null,
-	"retryCount": 0,
-	"uniqueKey": "https://www.tryprofound.com/careers/software-engineer-full-stack",
-	"url": "https://www.tryprofound.com/careers/software-engineer-full-stack"
-}

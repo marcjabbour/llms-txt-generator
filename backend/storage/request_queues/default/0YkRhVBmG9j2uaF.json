@@ -1,9 +1,0 @@
-{
-	"id": "0YkRhVBmG9j2uaF",
-	"json": "{\"id\":\"0YkRhVBmG9j2uaF\",\"url\":\"https://www.tryprofound.com/careers?department=Customer%20Success\",\"loadedUrl\":\"https://www.tryprofound.com/careers?department=Customer%20Success\",\"uniqueKey\":\"https://www.tryprofound.com/careers?department=Customer+Success\",\"method\":\"GET\",\"noRetry\":false,\"retryCount\":0,\"errorMessages\":[],\"headers\":{},\"userData\":{\"depth\":2,\"__crawlee\":{\"enqueueStrategy\":\"same-domain\",\"state\":4}},\"handledAt\":\"2025-09-02T21:18:06.913Z\"}",
-	"method": "GET",
-	"orderNo": null,
-	"retryCount": 0,
-	"uniqueKey": "https://www.tryprofound.com/careers?department=Customer+Success",
-	"url": "https://www.tryprofound.com/careers?department=Customer%20Success"
-}

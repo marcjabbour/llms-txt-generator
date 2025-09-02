@@ -1,9 +1,0 @@
-{
-	"id": "0jzPaqYkhidp1So",
-	"json": "{\"id\":\"0jzPaqYkhidp1So\",\"url\":\"https://docs.tryprofound.com/login?redirect=/agent-analytics/vercel_native\",\"loadedUrl\":\"https://docs.tryprofound.com/login?redirect=/agent-analytics/vercel_native\",\"uniqueKey\":\"https://docs.tryprofound.com/login?redirect=%2Fagent-analytics%2Fvercel_native\",\"method\":\"GET\",\"noRetry\":false,\"retryCount\":0,\"errorMessages\":[],\"headers\":{},\"userData\":{\"depth\":3,\"__crawlee\":{\"enqueueStrategy\":\"same-domain\",\"state\":4}},\"handledAt\":\"2025-09-02T21:18:18.618Z\"}",
-	"method": "GET",
-	"orderNo": null,
-	"retryCount": 0,
-	"uniqueKey": "https://docs.tryprofound.com/login?redirect=%2Fagent-analytics%2Fvercel_native",
-	"url": "https://docs.tryprofound.com/login?redirect=/agent-analytics/vercel_native"
-}
