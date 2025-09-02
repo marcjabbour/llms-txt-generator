@@ -1,0 +1,9 @@
+{
+	"id": "iMvtFJSMi9lj86W",
+	"json": "{\"id\":\"iMvtFJSMi9lj86W\",\"url\":\"https://www.tryprofound.com/features/shopping\",\"loadedUrl\":\"https://www.tryprofound.com/features/shopping\",\"uniqueKey\":\"https://www.tryprofound.com/features/shopping\",\"method\":\"GET\",\"noRetry\":false,\"retryCount\":0,\"errorMessages\":[],\"headers\":{},\"userData\":{\"depth\":1,\"__crawlee\":{\"enqueueStrategy\":\"same-domain\",\"state\":4}},\"handledAt\":\"2025-09-02T21:18:00.211Z\"}",
+	"method": "GET",
+	"orderNo": null,
+	"retryCount": 0,
+	"uniqueKey": "https://www.tryprofound.com/features/shopping",
+	"url": "https://www.tryprofound.com/features/shopping"
+}

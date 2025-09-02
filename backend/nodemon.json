@@ -1,0 +1,16 @@
+{
+  "ignore": [
+    "storage/",
+    "storage/**/*",
+    "*.json",
+    "*.txt",
+    "node_modules/"
+  ],
+  "watch": [
+    "src/"
+  ],
+  "ext": "js,json",
+  "env": {
+    "NODE_ENV": "development"
+  }
+}

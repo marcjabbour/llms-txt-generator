@@ -1,117 +1,305 @@
-const { validateUrl } = require('../utils/validation');
+import { PlaywrightCrawler } from 'crawlee';
+import { validateUrl } from '../utils/validation.js';
+import contentProcessor from './contentProcessor.js';
+import llmsTxtGenerator from './llmsTxtGenerator.js';
 
 class Scraper {
-  async scrape(url, options = {}) {
-    if (!validateUrl(url)) {
+  constructor() {
+    this.results = new Map();
+  }
+
+  async scrape(startUrl, options = {}) {
+    if (!validateUrl(startUrl)) {
       throw new Error('Invalid URL provided');
     }
 
-    const { maxPages = 50, maxDepth = 3, generateFullText = true } = options;
+    // Reset results for new scraping session
+    this.results.clear();
+    
+    const {
+      maxPages = 50,
+      maxDepth = 3,
+      sameDomain = true
+    } = options;
+    
+    console.log(`Scraper config: maxPages=${maxPages}, maxDepth=${maxDepth}, sameDomain=${sameDomain}`);
 
-    try {
-      // Step 1: Find pages to scrape
-      const urls = await this.findPages(url, maxPages, maxDepth);
-      
-      // Step 2: Scrape all pages
-      const pages = await this.scrapePages(urls);
-      
-      // Step 3: Generate content
-      const llmsContent = this.generateSummary(pages, url);
-      const llmsFullContent = generateFullText ? this.generateFull(pages, url) : null;
-
-      return {
-        success: true,
-        data: {
-          url,
-          totalPages: pages.length,
-          llmsContent,
-          llmsFullContent,
-          pages: pages.map(p => ({
-            url: p.url,
-            title: p.title || 'Untitled',
-            wordCount: this.countWords(p.content || '')
-          }))
-        },
-        scrapedAt: new Date().toISOString()
-      };
-    } catch (error) {
-      throw new Error(`Scraping failed: ${error.message}`);
-    }
-  }
-
-  async findPages(startUrl, maxPages, maxDepth) {
-    // TODO: Implement page discovery
-    console.log(`Finding pages from ${startUrl} (max: ${maxPages}, depth: ${maxDepth})`);
-    return [startUrl]; // For now, just return the start URL
-  }
-
-  async scrapePages(urls) {
-    // TODO: Implement parallel scraping
     const pages = [];
-    for (const url of urls) {
-      try {
-        console.log(`Scraping: ${url}`);
-        const page = await this.scrapePage(url);
-        pages.push({ url, ...page });
-      } catch (error) {
-        console.error(`Failed to scrape ${url}:`, error.message);
-      }
-    }
-    return pages;
-  }
+    const seenCanonical = new Set();
 
-  async scrapePage(url) {
-    // TODO: Implement single page scraping
+    const crawler = new PlaywrightCrawler({
+      maxRequestsPerCrawl: Math.max(100, maxPages * 2),
+      requestHandlerTimeoutSecs: 60,
+      preNavigationHooks: [
+        async (crawlingContext, gotoOptions) => {
+          const url = crawlingContext.request.url;
+          // Skip binary files before navigation
+          if (/\.(pdf|zip|gz|rar|7z|jpg|jpeg|png|gif|webp|svg|ico|mp4|mov|avi|mp3|wav|xlsx|xls|doc|docx|ppt|pptx|exe|dmg|pkg)$/i.test(url)) {
+            crawlingContext.log.debug(`Pre-navigation skip: ${url}`);
+            return false;
+          }
+        }
+      ],
+      requestHandler: async ({ request, page, enqueueLinks, log }) => {
+        log.info(`Processing: ${request.url}`);
+        
+        // Skip binary/download files early
+        if (/\.(pdf|zip|gz|rar|7z|jpg|jpeg|png|gif|webp|svg|ico|mp4|mov|avi|mp3|wav|xlsx|xls|doc|docx|ppt|pptx|exe|dmg|pkg)$/i.test(request.url)) {
+          log.debug(`Skipping binary file: ${request.url}`);
+          return;
+        }
+
+        const safe = async (fn, fallback = null) => {
+          try { return await fn(); } catch { return fallback; }
+        };
+
+        // Wait for page to load
+        await page.waitForLoadState('domcontentloaded');
+
+        const title = await safe(() => page.title(), null);
+        
+        const getAttr = (sel, attr = 'content') =>
+          page.$eval(sel, (el, a) => el.getAttribute(a), attr);
+
+        const description =
+          (await safe(() => getAttr('meta[name="description"]'))) ||
+          (await safe(() => getAttr('meta[property="og:description"]'))) ||
+          (await safe(() => getAttr('meta[name="twitter:description"]')));
+
+        const canonical =
+          (await safe(() => getAttr('link[rel="canonical"]', 'href'))) ||
+          request.loadedUrl || request.url;
+
+        const h1 = await safe(
+          () => page.$eval('h1', el => (el.textContent || '').trim()),
+          null
+        );
+
+        // Extract main content text
+        const textContent = await safe(() => page.evaluate(() => {
+          // Remove script and style elements
+          const scripts = document.querySelectorAll('script, style');
+          scripts.forEach(script => script.remove());
+          
+          // Try to get main content area
+          const contentSelectors = [
+            'main',
+            'article',
+            '[role="main"]',
+            '.content',
+            '#content',
+            '.main-content',
+            'body'
+          ];
+          
+          for (const selector of contentSelectors) {
+            const element = document.querySelector(selector);
+            if (element) {
+              return element.innerText.trim();
+            }
+          }
+          
+          return document.body.innerText.trim();
+        }), '');
+
+        const wordCount = textContent.split(/\s+/).length;
+
+        // Extract headings structure
+        const headings = await safe(() => page.$$eval('h1, h2, h3, h4, h5, h6', elements =>
+          elements.map(el => ({
+            level: parseInt(el.tagName.substring(1)),
+            text: el.innerText.trim(),
+            id: el.id || null
+          }))
+        ), []);
+
+        // Extract links
+        const links = await safe(() => page.$$eval('a[href]', elements =>
+          elements.map(el => ({
+            text: el.innerText.trim(),
+            href: el.href,
+            isExternal: el.hostname !== window.location.hostname
+          })).filter(link => link.text.length > 0)
+        ), []);
+
+        // Extract images
+        const images = await safe(() => page.$$eval('img[src]', elements =>
+          elements.map(el => ({
+            src: el.src,
+            alt: el.alt || '',
+            title: el.title || ''
+          }))
+        ), []);
+
+        // Get page path for organization
+        const urlObj = new URL(request.url);
+        const path = urlObj.pathname;
+        const domain = urlObj.hostname;
+
+        // Skip pages with access restrictions but keep utility pages
+        const isUtilityPage = /\/(login|privacy|terms|password|reset|contact|support|help)(?:\.|$|\/)/i.test(canonical);
+        const isRestricted = 
+          !isUtilityPage && (
+            (title && /access.restricted|login.required|unauthorized|403|404/i.test(title)) ||
+            (textContent && /access.restricted|login.required|unauthorized|please.log.?in/i.test(textContent)) ||
+            (canonical.includes('/login') && !isUtilityPage) ||
+            canonical.includes('redirect=')
+          );
+
+        if (!seenCanonical.has(canonical) && !isRestricted) {
+          seenCanonical.add(canonical);
+          
+          const metadata = {
+            url: canonical,
+            success: true,
+            timestamp: new Date().toISOString(),
+            title,
+            description,
+            textContent,
+            wordCount,
+            headings,
+            links,
+            images,
+            path,
+            domain,
+            h1
+          };
+
+          this.results.set(canonical, metadata);
+          pages.push(metadata);
+        }
+
+        const depth = (request.userData?.depth ?? 0);
+        if (depth < maxDepth) {
+          log.info(`Depth ${depth}/${maxDepth}, enqueueing links from ${request.url}`);
+          
+          await enqueueLinks({
+            strategy: 'same-domain',
+            transformRequestFunction: (req) => {
+              try {
+                const u = new URL(req.url);
+                
+                // Skip binary files and downloads
+                if (/\.(pdf|zip|gz|rar|7z|jpg|jpeg|png|gif|webp|svg|ico|mp4|mov|avi|mp3|wav|xlsx|xls|doc|docx|ppt|pptx|exe|dmg|pkg)$/i.test(u.pathname)) {
+                  return null;
+                }
+                
+                // Skip common non-content URLs
+                const skipPatterns = [
+                  /\/search\?/i,
+                  /\/admin/i,
+                  /\/wp-admin/i,
+                  /\/logout$/i,
+                  /^mailto:/i,
+                  /^tel:/i,
+                  /^ftp:/i,
+                  /#$/,
+                ];
+                
+                if (skipPatterns.some(pattern => pattern.test(req.url))) {
+                  return null;
+                }
+                
+                req.userData = { ...(req.userData || {}), depth: depth + 1 };
+                log.info(`Enqueueing link: ${req.url} (depth ${depth + 1})`);
+                return req;
+              } catch (error) {
+                log.error(`Error processing link ${req.url}:`, error);
+                return null;
+              }
+            },
+          });
+        } else {
+          log.info(`Max depth ${maxDepth} reached for ${request.url}`);
+        }
+      },
+      
+      failedRequestHandler: async ({ request, log }) => {
+        log.error(`Request failed: ${request.url}`);
+        this.results.set(request.url, {
+          url: request.url,
+          error: 'Request failed',
+          timestamp: new Date().toISOString(),
+          success: false
+        });
+      },
+    });
+
+    // Start crawling
+    console.log(`Starting crawler with startUrl: ${startUrl}`);
+    await crawler.run([{ 
+      url: startUrl, 
+      userData: { depth: 0 } 
+    }]);
+    
+    console.log(`Crawler finished. Total pages processed: ${this.results.size}`);
+
+    // Convert results to array and generate consolidated data
+    const pagesData = Array.from(this.results.values());
+    const consolidatedData = await this.consolidateData(pagesData, startUrl);
+
     return {
-      title: 'Sample Title',
-      content: 'Sample content from the page',
-      links: []
+      success: true,
+      startUrl,
+      totalPages: pagesData.length,
+      pages: pagesData,
+      data: consolidatedData,
+      timestamp: new Date().toISOString()
     };
   }
 
-  generateSummary(pages, baseUrl) {
-    const domain = new URL(baseUrl).hostname;
-    let content = `# ${domain}\n\n`;
+  shouldSkipUrl(url) {
+    const skipPatterns = [
+      /\/search\?/i,
+      /\/admin/i,
+      /\/wp-admin/i,
+      /\/logout$/i,
+      /^mailto:/i,
+      /^tel:/i,
+      /^ftp:/i,
+      /#$/,
+    ];
+
+    return skipPatterns.some(pattern => pattern.test(url));
+  }
+
+  async consolidateData(pagesData, startUrl) {
+    const successfulPages = pagesData.filter(page => page.success);
+    const domain = new URL(startUrl).hostname;
     
-    if (pages[0]?.content) {
-      const summary = this.truncate(pages[0].content, 500);
-      content += `## Overview\n${summary}\n\n`;
-    }
+    console.log(`Processing ${successfulPages.length} pages with AI analysis...`);
+    
+    // Process pages with LLM analysis
+    const processedPages = await contentProcessor.processPages(successfulPages);
+    
+    console.log(`Generating site description for ${domain}...`);
+    
+    // Generate site description
+    const siteDescription = await contentProcessor.generateSiteDescription(domain, processedPages);
+    
+    console.log(`Generating structured llms.txt content...`);
+    
+    // Generate structured content
+    const llmsContent = llmsTxtGenerator.generateStructuredContent(
+      domain, 
+      siteDescription, 
+      processedPages
+    );
+    
+    // Generate summary statistics
+    const summaryStats = llmsTxtGenerator.generateSummaryStats(processedPages);
 
-    content += `## Pages\n`;
-    pages.forEach(page => {
-      const path = page.url.replace(baseUrl, '') || '/';
-      content += `- [${page.title}](${path})\n`;
-    });
-
-    return content;
-  }
-
-  generateFull(pages, baseUrl) {
-    const domain = new URL(baseUrl).hostname;
-    let content = `# ${domain} - Full Content\n\n`;
-
-    pages.forEach(page => {
-      if (page.content?.trim()) {
-        content += `## ${page.title}\n`;
-        content += `URL: ${page.url}\n\n`;
-        content += `${page.content}\n\n---\n\n`;
+    return {
+      llmsContent,
+      summary: {
+        ...summaryStats,
+        domains: [...new Set(processedPages.map(page => page.domain))],
+        paths: processedPages.map(page => page.path),
+        siteDescription,
+        aiProcessed: true
       }
-    });
-
-    return content;
-  }
-
-  truncate(text, maxLength) {
-    if (!text || text.length <= maxLength) return text;
-    const truncated = text.substring(0, maxLength);
-    const lastSpace = truncated.lastIndexOf(' ');
-    return (lastSpace > maxLength * 0.8 ? truncated.substring(0, lastSpace) : truncated) + '...';
-  }
-
-  countWords(text) {
-    return text ? text.trim().split(/\s+/).filter(w => w.length > 0).length : 0;
+    };
   }
 }
 
-module.exports = new Scraper();
+export default new Scraper();

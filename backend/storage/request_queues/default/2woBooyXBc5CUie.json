@@ -1,0 +1,9 @@
+{
+	"id": "2woBooyXBc5CUie",
+	"json": "{\"id\":\"2woBooyXBc5CUie\",\"url\":\"https://docs.tryprofound.com/login?redirect=/rest-api/introduction\",\"loadedUrl\":\"https://docs.tryprofound.com/login?redirect=/rest-api/introduction\",\"uniqueKey\":\"https://docs.tryprofound.com/login?redirect=%2Frest-api%2Fintroduction\",\"method\":\"GET\",\"noRetry\":false,\"retryCount\":0,\"errorMessages\":[],\"headers\":{},\"userData\":{\"depth\":3,\"__crawlee\":{\"enqueueStrategy\":\"same-domain\",\"state\":4}},\"handledAt\":\"2025-09-02T21:18:18.047Z\"}",
+	"method": "GET",
+	"orderNo": null,
+	"retryCount": 0,
+	"uniqueKey": "https://docs.tryprofound.com/login?redirect=%2Frest-api%2Fintroduction",
+	"url": "https://docs.tryprofound.com/login?redirect=/rest-api/introduction"
+}

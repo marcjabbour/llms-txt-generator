@@ -1,0 +1,9 @@
+{
+	"id": "igD3VtyDEBwnGNv",
+	"json": "{\"id\":\"igD3VtyDEBwnGNv\",\"url\":\"https://www.tryprofound.com/careers/software-engineer-frontend\",\"loadedUrl\":\"https://www.tryprofound.com/careers/software-engineer-frontend\",\"uniqueKey\":\"https://www.tryprofound.com/careers/software-engineer-frontend\",\"method\":\"GET\",\"noRetry\":false,\"retryCount\":0,\"errorMessages\":[],\"headers\":{},\"userData\":{\"depth\":2,\"__crawlee\":{\"enqueueStrategy\":\"same-domain\",\"state\":4}},\"handledAt\":\"2025-09-02T21:18:08.426Z\"}",
+	"method": "GET",
+	"orderNo": null,
+	"retryCount": 0,
+	"uniqueKey": "https://www.tryprofound.com/careers/software-engineer-frontend",
+	"url": "https://www.tryprofound.com/careers/software-engineer-frontend"
+}

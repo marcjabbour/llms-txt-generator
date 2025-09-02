@@ -1,0 +1,9 @@
+{
+	"id": "ZRfXw4nZvnMR4V4",
+	"json": "{\"id\":\"ZRfXw4nZvnMR4V4\",\"url\":\"https://www.tryprofound.com/contact-sales\",\"loadedUrl\":\"https://www.tryprofound.com/contact-sales\",\"uniqueKey\":\"https://www.tryprofound.com/contact-sales\",\"method\":\"GET\",\"noRetry\":false,\"retryCount\":0,\"errorMessages\":[],\"headers\":{},\"userData\":{\"depth\":1,\"__crawlee\":{\"enqueueStrategy\":\"same-domain\",\"state\":4}},\"handledAt\":\"2025-09-02T21:17:59.110Z\"}",
+	"method": "GET",
+	"orderNo": null,
+	"retryCount": 0,
+	"uniqueKey": "https://www.tryprofound.com/contact-sales",
+	"url": "https://www.tryprofound.com/contact-sales"
+}

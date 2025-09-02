@@ -1,0 +1,9 @@
+{
+	"id": "mZ4jbAKuyCo98j2",
+	"json": "{\"id\":\"mZ4jbAKuyCo98j2\",\"url\":\"https://www.tryprofound.com/\",\"loadedUrl\":\"https://www.tryprofound.com/\",\"uniqueKey\":\"https://www.tryprofound.com\",\"method\":\"GET\",\"noRetry\":false,\"retryCount\":0,\"errorMessages\":[],\"headers\":{},\"userData\":{\"depth\":1,\"__crawlee\":{\"enqueueStrategy\":\"same-domain\",\"state\":4}},\"handledAt\":\"2025-09-02T21:17:57.246Z\"}",
+	"method": "GET",
+	"orderNo": null,
+	"retryCount": 0,
+	"uniqueKey": "https://www.tryprofound.com",
+	"url": "https://www.tryprofound.com/"
+}

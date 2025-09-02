@@ -1,0 +1,9 @@
+{
+	"id": "DpCUHBTCFtlOYKY",
+	"json": "{\"id\":\"DpCUHBTCFtlOYKY\",\"url\":\"https://www.tryprofound.com/blog/introducing-keyword-hierarchies\",\"loadedUrl\":\"https://www.tryprofound.com/blog/introducing-keyword-hierarchies\",\"uniqueKey\":\"https://www.tryprofound.com/blog/introducing-keyword-hierarchies\",\"method\":\"GET\",\"noRetry\":false,\"retryCount\":0,\"errorMessages\":[],\"headers\":{},\"userData\":{\"depth\":2,\"__crawlee\":{\"enqueueStrategy\":\"same-domain\",\"state\":4}},\"handledAt\":\"2025-09-02T21:18:14.463Z\"}",
+	"method": "GET",
+	"orderNo": null,
+	"retryCount": 0,
+	"uniqueKey": "https://www.tryprofound.com/blog/introducing-keyword-hierarchies",
+	"url": "https://www.tryprofound.com/blog/introducing-keyword-hierarchies"
+}

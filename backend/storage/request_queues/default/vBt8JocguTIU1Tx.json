@@ -1,0 +1,9 @@
+{
+	"id": "vBt8JocguTIU1Tx",
+	"json": "{\"id\":\"vBt8JocguTIU1Tx\",\"url\":\"https://docs.tryprofound.com/agent-analytics/netlify\",\"loadedUrl\":\"https://docs.tryprofound.com/login?redirect=%2Fagent-analytics%2Fnetlify\",\"uniqueKey\":\"https://docs.tryprofound.com/agent-analytics/netlify\",\"method\":\"GET\",\"noRetry\":false,\"retryCount\":0,\"errorMessages\":[],\"headers\":{},\"userData\":{\"depth\":2,\"__crawlee\":{\"enqueueStrategy\":\"same-domain\",\"state\":4}},\"handledAt\":\"2025-09-02T21:18:18.114Z\"}",
+	"method": "GET",
+	"orderNo": null,
+	"retryCount": 0,
+	"uniqueKey": "https://docs.tryprofound.com/agent-analytics/netlify",
+	"url": "https://docs.tryprofound.com/agent-analytics/netlify"
+}

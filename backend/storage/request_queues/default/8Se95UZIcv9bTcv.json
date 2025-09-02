@@ -1,0 +1,9 @@
+{
+	"id": "8Se95UZIcv9bTcv",
+	"json": "{\"id\":\"8Se95UZIcv9bTcv\",\"url\":\"https://www.tryprofound.com/blog/beyond-javascript-ai-crawlers\",\"loadedUrl\":\"https://www.tryprofound.com/blog/beyond-javascript-ai-crawlers\",\"uniqueKey\":\"https://www.tryprofound.com/blog/beyond-javascript-ai-crawlers\",\"method\":\"GET\",\"noRetry\":false,\"retryCount\":0,\"errorMessages\":[],\"headers\":{},\"userData\":{\"depth\":2,\"__crawlee\":{\"enqueueStrategy\":\"same-domain\",\"state\":4}},\"handledAt\":\"2025-09-02T21:18:12.998Z\"}",
+	"method": "GET",
+	"orderNo": null,
+	"retryCount": 0,
+	"uniqueKey": "https://www.tryprofound.com/blog/beyond-javascript-ai-crawlers",
+	"url": "https://www.tryprofound.com/blog/beyond-javascript-ai-crawlers"
+}

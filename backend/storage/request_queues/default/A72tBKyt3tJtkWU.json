@@ -1,0 +1,9 @@
+{
+	"id": "A72tBKyt3tJtkWU",
+	"json": "{\"id\":\"A72tBKyt3tJtkWU\",\"url\":\"https://www.tryprofound.com/customers/airbyte\",\"loadedUrl\":\"https://www.tryprofound.com/customers/airbyte\",\"uniqueKey\":\"https://www.tryprofound.com/customers/airbyte\",\"method\":\"GET\",\"noRetry\":false,\"retryCount\":0,\"errorMessages\":[],\"headers\":{},\"userData\":{\"depth\":2,\"__crawlee\":{\"enqueueStrategy\":\"same-domain\",\"state\":4}},\"handledAt\":\"2025-09-02T21:18:06.138Z\"}",
+	"method": "GET",
+	"orderNo": null,
+	"retryCount": 0,
+	"uniqueKey": "https://www.tryprofound.com/customers/airbyte",
+	"url": "https://www.tryprofound.com/customers/airbyte"
+}

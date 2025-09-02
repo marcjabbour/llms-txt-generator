@@ -1,0 +1,9 @@
+{
+	"id": "pX5ic4YrHk0ZQhp",
+	"json": "{\"id\":\"pX5ic4YrHk0ZQhp\",\"url\":\"https://www.tryprofound.com/careers?department=Legal\",\"loadedUrl\":\"https://www.tryprofound.com/careers?department=Legal\",\"uniqueKey\":\"https://www.tryprofound.com/careers?department=Legal\",\"method\":\"GET\",\"noRetry\":false,\"retryCount\":0,\"errorMessages\":[],\"headers\":{},\"userData\":{\"depth\":2,\"__crawlee\":{\"enqueueStrategy\":\"same-domain\",\"state\":4}},\"handledAt\":\"2025-09-02T21:18:07.319Z\"}",
+	"method": "GET",
+	"orderNo": null,
+	"retryCount": 0,
+	"uniqueKey": "https://www.tryprofound.com/careers?department=Legal",
+	"url": "https://www.tryprofound.com/careers?department=Legal"
+}

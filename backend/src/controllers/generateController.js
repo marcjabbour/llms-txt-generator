@@ -1,5 +1,5 @@
-const scraper = require('../services/scraper');
-const { v4: uuidv4 } = require('uuid');
+import scraper from '../services/scraper.js';
+import { v4 as uuidv4 } from 'uuid';
 
 const jobs = new Map();
 
@@ -98,39 +98,8 @@ const downloadLlmsFile = async (req, res) => {
   }
 };
 
-const downloadLlmsFullFile = async (req, res) => {
-  try {
-    const { jobId } = req.params;
-    const job = jobs.get(jobId);
-
-    if (!job) {
-      return res.status(404).json({ error: 'Job not found' });
-    }
-
-    if (job.status !== 'completed') {
-      return res.status(400).json({ error: 'Job not completed yet' });
-    }
-
-    if (!job.result?.data?.llmsFullContent) {
-      return res.status(404).json({ error: 'LLMS full content not available' });
-    }
-
-    const domain = job.url ? new URL(job.url).hostname : 'website';
-    const filename = `${domain}-llms-full.txt`;
-    
-    res.setHeader('Content-Type', 'text/plain');
-    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-    res.send(job.result.data.llmsFullContent);
-
-  } catch (error) {
-    console.error('Error in downloadLlmsFullFile:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-};
-
-module.exports = {
+export {
   handleGenerate,
   getGenerateStatus,
-  downloadLlmsFile,
-  downloadLlmsFullFile
+  downloadLlmsFile
 };

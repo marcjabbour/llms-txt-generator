@@ -12,7 +12,4 @@ const sanitizeInput = (input) => {
   return input.trim().replace(/[<>\"']/g, '');
 };
 
-module.exports = {
-  validateUrl,
-  sanitizeInput
-};
+export { validateUrl, sanitizeInput };

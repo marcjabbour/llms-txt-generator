@@ -1,0 +1,9 @@
+{
+	"id": "BYMqeI5IuzoZ2Ja",
+	"json": "{\"id\":\"BYMqeI5IuzoZ2Ja\",\"url\":\"https://www.tryprofound.com/careers/data-scientist\",\"loadedUrl\":\"https://www.tryprofound.com/careers/data-scientist\",\"uniqueKey\":\"https://www.tryprofound.com/careers/data-scientist\",\"method\":\"GET\",\"noRetry\":false,\"retryCount\":0,\"errorMessages\":[],\"headers\":{},\"userData\":{\"depth\":2,\"__crawlee\":{\"enqueueStrategy\":\"same-domain\",\"state\":4}},\"handledAt\":\"2025-09-02T21:18:08.987Z\"}",
+	"method": "GET",
+	"orderNo": null,
+	"retryCount": 0,
+	"uniqueKey": "https://www.tryprofound.com/careers/data-scientist",
+	"url": "https://www.tryprofound.com/careers/data-scientist"
+}

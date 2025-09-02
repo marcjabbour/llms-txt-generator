@@ -1,0 +1,9 @@
+{
+	"id": "76xyGJ4c91Uu5Yk",
+	"json": "{\"id\":\"76xyGJ4c91Uu5Yk\",\"url\":\"https://www.tryprofound.com/careers/general\",\"loadedUrl\":\"https://www.tryprofound.com/careers/general\",\"uniqueKey\":\"https://www.tryprofound.com/careers/general\",\"method\":\"GET\",\"noRetry\":false,\"retryCount\":0,\"errorMessages\":[],\"headers\":{},\"userData\":{\"depth\":2,\"__crawlee\":{\"enqueueStrategy\":\"same-domain\",\"state\":4}},\"handledAt\":\"2025-09-02T21:18:07.994Z\"}",
+	"method": "GET",
+	"orderNo": null,
+	"retryCount": 0,
+	"uniqueKey": "https://www.tryprofound.com/careers/general",
+	"url": "https://www.tryprofound.com/careers/general"
+}

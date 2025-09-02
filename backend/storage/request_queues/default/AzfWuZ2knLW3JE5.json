@@ -1,0 +1,9 @@
+{
+	"id": "AzfWuZ2knLW3JE5",
+	"json": "{\"id\":\"AzfWuZ2knLW3JE5\",\"url\":\"https://docs.tryprofound.com/agent-analytics/overview\",\"loadedUrl\":\"https://docs.tryprofound.com/agent-analytics/overview\",\"uniqueKey\":\"https://docs.tryprofound.com/agent-analytics/overview\",\"method\":\"GET\",\"noRetry\":false,\"retryCount\":0,\"errorMessages\":[],\"headers\":{},\"userData\":{\"depth\":2,\"__crawlee\":{\"enqueueStrategy\":\"same-domain\",\"state\":4}},\"handledAt\":\"2025-09-02T21:18:16.372Z\"}",
+	"method": "GET",
+	"orderNo": null,
+	"retryCount": 0,
+	"uniqueKey": "https://docs.tryprofound.com/agent-analytics/overview",
+	"url": "https://docs.tryprofound.com/agent-analytics/overview"
+}
