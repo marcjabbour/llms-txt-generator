@@ -18,94 +18,28 @@ class ContentProcessor {
     });
   }
 
-  async discoverCategories(pagesData) {
-    try {
-      const urlPaths = pagesData.map(page => ({
-        url: page.url,
-        path: new URL(page.url).pathname,
-        title: page.title || 'Untitled'
-      }));
-
-      const prompt = `Analyze these website URLs and paths to discover the natural categories this website uses.
-
-Website URLs and Paths:
-${urlPaths.map(p => `- ${p.path} (${p.title})`).join('\n')}
-
-Based on the URL patterns and page titles, determine the main content categories this website naturally organizes itself into. Look for patterns like:
-- URL segments (/blog/, /docs/, /products/, etc.)
-- Common prefixes or groupings
-- Logical content organization
-
-Respond with ONLY a valid JSON object listing the discovered categories:
-{
-  "categories": [
-    "Category 1",
-    "Category 2", 
-    "Category 3"
-  ]
-}
-
-Use the actual categories you can infer from the URLs, not generic ones. Be specific to this website.`;
-
-      const response = await this.openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-          {
-            role: "system",
-            content: "You are an expert at analyzing website structure and discovering natural content categories from URL patterns. Always respond with valid JSON only."
-          },
-          {
-            role: "user",
-            content: prompt
-          }
-        ],
-        temperature: 0.2,
-        max_tokens: 200
-      });
-
-      let responseContent = response.choices[0].message.content.trim();
-      
-      // Remove markdown code blocks if present
-      if (responseContent.startsWith('```json')) {
-        responseContent = responseContent.replace(/```json\n?/, '').replace(/\n?```$/, '');
-      } else if (responseContent.startsWith('```')) {
-        responseContent = responseContent.replace(/```\n?/, '').replace(/\n?```$/, '');
-      }
-      
-      const result = JSON.parse(responseContent);
-      return result.categories || [];
-
-    } catch (error) {
-      console.error('Error discovering categories:', error);
-      return ['General']; // Fallback
-    }
-  }
-
-  async analyzePage(pageData, discoveredCategories) {
+  async analyzePage(pageData) {
     if (!pageData.success || !pageData.textContent) {
       return null;
     }
 
     try {
-      const prompt = `Analyze this webpage content and categorize it.
+      const prompt = `Analyze this webpage content and extract key information.
 
 Title: ${pageData.title || 'Unknown'}
 URL: ${pageData.url}
-Path: ${new URL(pageData.url).pathname}
 Description: ${pageData.description || 'None'}
 Content: ${pageData.textContent.substring(0, 2000)}...
 
-Available Categories for this website: ${discoveredCategories.join(', ')}
-
 Please provide:
-1. A concise 1-2 sentence description of what this page offers (suitable for llms.txt)
-2. Which of the available categories this page best fits into
+1. A concise 1-2 sentence description of what this page offers (like the examples in an llms.txt file)
+2. The primary category this page belongs to (Blog, Guides, Features, Products, About, Customers, Careers, etc.)
 3. The main value proposition or purpose
 
-Respond with ONLY a valid JSON object:
+Respond with ONLY a valid JSON object (no markdown, no code blocks, no additional text):
 {
   "description": "Brief, compelling description",
-  "category": "One of the available categories",
+  "category": "Primary category", 
   "purpose": "Main purpose/value proposition"
 }`;
 
@@ -114,7 +48,7 @@ Respond with ONLY a valid JSON object:
         messages: [
           {
             role: "system",
-            content: "You are an expert content analyst. Create concise, compelling descriptions suitable for llms.txt files. Always respond with valid JSON only."
+            content: "You are an expert content analyst. Create concise, compelling descriptions suitable for llms.txt files that help AI systems understand website content. Always respond with valid JSON only, no markdown formatting or code blocks."
           },
           {
             role: "user", 
@@ -127,7 +61,7 @@ Respond with ONLY a valid JSON object:
 
       let responseContent = response.choices[0].message.content.trim();
       
-      // Remove markdown code blocks if present  
+      // Remove markdown code blocks if present
       if (responseContent.startsWith('```json')) {
         responseContent = responseContent.replace(/```json\n?/, '').replace(/\n?```$/, '');
       } else if (responseContent.startsWith('```')) {
@@ -162,7 +96,7 @@ Respond with ONLY a valid JSON object:
         ...pageData,
         aiAnalysis: {
           description: this.generateFallbackDescription(pageData),
-          category: this.inferCategoryFromUrl(pageData.url, discoveredCategories),
+          category: this.inferCategoryFromUrl(pageData.url),
           purpose: pageData.description || pageData.title || 'Information resource',
           processed: false
         }
@@ -235,31 +169,28 @@ Respond with just the description, no additional text.`;
     return 'Information and resources';
   }
 
-  inferCategoryFromUrl(url, discoveredCategories = ['General']) {
+  inferCategoryFromUrl(url) {
     const path = new URL(url).pathname.toLowerCase();
     
-    // Try to match against discovered categories based on URL patterns
-    for (const category of discoveredCategories) {
-      const categoryLower = category.toLowerCase();
-      if (path.includes(`/${categoryLower}`) || 
-          path.includes(categoryLower) ||
-          (categoryLower === 'home' && path === '/')) {
-        return category;
-      }
-    }
+    if (path.includes('/blog')) return 'Blog';
+    if (path.includes('/guide') || path.includes('/tutorial')) return 'Guides';
+    if (path.includes('/feature') || path.includes('/product')) return 'Features';
+    if (path.includes('/about')) return 'About';
+    if (path.includes('/contact')) return 'Contact';
+    if (path.includes('/customer') || path.includes('/case-stud')) return 'Customers';
+    if (path.includes('/career') || path.includes('/job')) return 'Careers';
+    if (path.includes('/pricing')) return 'Pricing';
+    if (path.includes('/login') || path.includes('/signin')) return 'Login';
+    if (path.includes('/signup') || path.includes('/register')) return 'Registration';
+    if (path.includes('/privacy')) return 'Privacy Policy';
+    if (path.includes('/terms')) return 'Terms';
+    if (path.includes('/help') || path.includes('/support')) return 'Support';
+    if (path.includes('/api') || path.includes('/docs')) return 'Documentation';
     
-    return discoveredCategories[0] || 'General';
+    return 'General';
   }
 
   async processPages(pagesData) {
-    console.log('Step 1: Discovering categories from website structure...');
-    
-    // First, discover categories from the website structure
-    const discoveredCategories = await this.discoverCategories(pagesData);
-    console.log('Discovered categories:', discoveredCategories);
-    
-    console.log('Step 2: Analyzing individual pages...');
-    
     const processedPages = [];
     
     // Process pages in batches to avoid rate limits
@@ -267,7 +198,7 @@ Respond with just the description, no additional text.`;
     for (let i = 0; i < pagesData.length; i += batchSize) {
       const batch = pagesData.slice(i, i + batchSize);
       
-      const batchPromises = batch.map(page => this.analyzePage(page, discoveredCategories));
+      const batchPromises = batch.map(page => this.analyzePage(page));
       const batchResults = await Promise.all(batchPromises);
       
       processedPages.push(...batchResults.filter(page => page !== null));
