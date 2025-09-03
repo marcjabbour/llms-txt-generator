@@ -229,7 +229,7 @@ class Scraper {
             },
           });
         } else {
-          log.info(`Max depth ${maxDepth} reached for ${request.url}`);
+          // log.info(`Max depth ${maxDepth} reached for ${request.url}`);
         }
       },
       

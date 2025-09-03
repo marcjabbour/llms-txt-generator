@@ -352,9 +352,10 @@ const WatchedUrlCard = ({ url, onRemove, onRegenerate }) => {
           </button>
           <button
             onClick={() => onRemove(url.id)}
-            className="action-btn remove-btn"
+            className="action-btn stop-watch-btn"
+            title="Stop watching this URL"
           >
-            🗑️
+            🚫
           </button>
         </div>
       </div>

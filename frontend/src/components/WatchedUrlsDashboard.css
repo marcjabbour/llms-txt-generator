@@ -345,6 +345,12 @@
   border-color: #feb2b2;
 }
 
+.stop-watch-btn:hover {
+  background: #fef3c7;
+  border-color: #fde68a;
+  color: #92400e;
+}
+
 .url-status {
   margin-bottom: 16px;
 }

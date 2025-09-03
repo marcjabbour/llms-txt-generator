@@ -145,11 +145,16 @@ class UrlMonitor {
       const etag = response.headers.get('etag');
       const lastModified = response.headers.get('last-modified');
       const contentLength = response.headers.get('content-length');
+      console.log('ETAG: ', etag);
+      console.log('LAST MODIFIED: ', lastModified);
+      console.log('CONTENT LENGTH: ', contentLength);
       
       // Create a signature from available headers
       const headerSignature = [etag, lastModified, contentLength]
         .filter(Boolean)
         .join('|');
+
+      console.log('HEADER SIGNATURE: ', headerSignature);
 
       if (!headerSignature) {
         console.log(`No useful headers found for ${watchedUrl.url}, falling back to HTML check`);
