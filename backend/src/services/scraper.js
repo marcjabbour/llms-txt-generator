@@ -190,7 +190,7 @@ class Scraper {
 
         const depth = (request.userData?.depth ?? 0);
         if (depth < maxDepth) {
-          log.info(`Depth ${depth}/${maxDepth}, enqueueing links from ${request.url}`);
+          // log.info(`Depth ${depth}/${maxDepth}, enqueueing links from ${request.url}`);
           
           await enqueueLinks({
             strategy: 'same-domain',

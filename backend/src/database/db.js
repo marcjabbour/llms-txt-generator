@@ -1,6 +1,8 @@
 import sqlite3 from 'sqlite3';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -33,8 +35,8 @@ class Database {
       CREATE TABLE IF NOT EXISTS watched_urls (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         url TEXT UNIQUE NOT NULL,
-        first_created DATETIME DEFAULT CURRENT_TIMESTAMP,
-        last_updated DATETIME DEFAULT CURRENT_TIMESTAMP,
+        first_created DATETIME DEFAULT (datetime('now', 'localtime')),
+        last_updated DATETIME DEFAULT (datetime('now', 'localtime')),
         check_frequency INTEGER DEFAULT 60,
         is_active BOOLEAN DEFAULT 1,
         last_content_hash TEXT
@@ -47,7 +49,7 @@ class Database {
         watched_url_id INTEGER,
         job_id TEXT UNIQUE,
         status TEXT DEFAULT 'pending',
-        started_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        started_at DATETIME DEFAULT (datetime('now', 'localtime')),
         completed_at DATETIME,
         file_path TEXT,
         error_message TEXT,
@@ -81,7 +83,7 @@ class Database {
   }
 
   // Watched URLs methods
-  async addWatchedUrl(url, checkFrequency = 60) {
+  async addWatchedUrl(url, checkFrequency = process.env.DEFAULT_CHECK_FREQUENCY_MINUTES || 10) {
     return new Promise((resolve, reject) => {
       // Don't set last_updated when first adding - let it be NULL so it gets checked soon
       const stmt = `INSERT OR REPLACE INTO watched_urls (url, check_frequency) VALUES (?, ?)`;
@@ -133,7 +135,7 @@ class Database {
 
   async updateContentHash(urlId, contentHash) {
     return new Promise((resolve, reject) => {
-      this.db.run(`UPDATE watched_urls SET last_content_hash = ?, last_updated = CURRENT_TIMESTAMP WHERE id = ?`, 
+      this.db.run(`UPDATE watched_urls SET last_content_hash = ?, last_updated = datetime('now', 'localtime') WHERE id = ?`, 
         [contentHash, urlId], function(err) {
         if (err) reject(err);
         else resolve({ changes: this.changes });
@@ -244,7 +246,7 @@ class Database {
       SELECT * FROM watched_urls 
       WHERE is_active = 1 
       AND (last_updated IS NULL OR 
-           datetime('now') >= datetime(last_updated, '+' || check_frequency || ' minutes'))
+           datetime('now', 'localtime') >= datetime(last_updated, '+' || check_frequency || ' minutes'))
     `;
     return new Promise((resolve, reject) => {
       this.db.all(query, (err, rows) => {

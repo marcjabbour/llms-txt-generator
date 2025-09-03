@@ -5,7 +5,7 @@ class WatchService {
     return await ApiService.get('/api/watch');
   }
 
-  async addWatchedUrl(url, checkFrequency = 60) {
+  async addWatchedUrl(url, checkFrequency = 10) {
     return await ApiService.post('/api/watch', { url, checkFrequency });
   }
 
@@ -96,6 +96,10 @@ class WatchService {
     
     const lastCheck = new Date(lastUpdated);
     const nextCheck = new Date(lastCheck.getTime() + (checkFrequency * 60 * 1000));
+    console.log('Last checked:', lastCheck);
+    console.log('Next check time:', nextCheck);
+    console.log('Check frequency:', checkFrequency);
+    console.log('Last Check Time' + lastCheck.getTime())
     const now = new Date();
     
     // If next check time has passed, it's overdue
@@ -105,6 +109,8 @@ class WatchService {
     
     const diffMs = nextCheck - now;
     const diffMinutes = Math.floor(diffMs / (1000 * 60));
+    console.log('Diff Ms: ', diffMs)
+    console.log('Diff Minutes: ', diffMinutes)
     
     if (diffMinutes < 1) {
       return 'Soon';

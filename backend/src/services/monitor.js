@@ -13,7 +13,7 @@ const GENERATED_FILES_DIR = path.join(__dirname, '../../generated-files');
 class UrlMonitor {
   constructor() {
     this.isRunning = false;
-    this.checkInterval = 60000; // Check every minute
+    this.checkInterval = 300000; // Check every 5 minutes (5 * 60 * 1000ms)
     this.intervalId = null;
   }
 
@@ -116,36 +116,97 @@ class UrlMonitor {
 
   async hasContentChanged(watchedUrl) {
     try {
-      // For initial implementation, we'll do a simple approach:
-      // Perform a lightweight scrape and compare content hashes
-      
-      // Quick scrape to get current content
-      const result = await scraper.scrape(watchedUrl.url, { 
-        maxPages: 5, // Limit pages for quick check
-        maxDepth: 1  // Only check main pages
-      });
-
-      if (!result.success || !result.data || !result.data.llmsContent) {
-        console.log(`Failed to get content for ${watchedUrl.url}`);
-        return { changed: false, currentHash: watchedUrl.last_content_hash }; // Don't regenerate if we can't get content
+      // Try HTTP header-based detection first (most efficient)
+      const headerResult = await this.checkHttpHeaders(watchedUrl);
+      if (headerResult.success) {
+        return headerResult;
       }
 
-      // Create hash of current content
-      const currentHash = createHash('sha256')
-        .update(result.data.llmsContent)
-        .digest('hex');
-
-      // If no previous hash exists, consider it changed (first time)
-      if (!watchedUrl.last_content_hash) {
-        return { changed: true, currentHash };
-      }
-
-      const changed = currentHash !== watchedUrl.last_content_hash;
-      return { changed, currentHash };
+      // Fallback to raw HTML hash comparison (avoids scraping differences)
+      const htmlResult = await this.checkRawHtmlHash(watchedUrl);
+      return htmlResult;
       
     } catch (error) {
       console.error(`Error checking content changes for ${watchedUrl.url}:`, error);
       return { changed: false, currentHash: watchedUrl.last_content_hash }; // Don't trigger regeneration on error
+    }
+  }
+
+  async checkHttpHeaders(watchedUrl) {
+    try {
+      console.log(`Checking HTTP headers for ${watchedUrl.url}`);
+      
+      const response = await fetch(watchedUrl.url, { 
+        method: 'HEAD',
+        timeout: 10000 // 10 second timeout
+      });
+
+      const etag = response.headers.get('etag');
+      const lastModified = response.headers.get('last-modified');
+      const contentLength = response.headers.get('content-length');
+      
+      // Create a signature from available headers
+      const headerSignature = [etag, lastModified, contentLength]
+        .filter(Boolean)
+        .join('|');
+
+      if (!headerSignature) {
+        console.log(`No useful headers found for ${watchedUrl.url}, falling back to HTML check`);
+        return { success: false };
+      }
+
+      const currentHash = createHash('sha256')
+        .update(headerSignature)
+        .digest('hex');
+
+      // If no previous hash exists, consider it changed (first time)
+      if (!watchedUrl.last_content_hash) {
+        console.log(`First time check for ${watchedUrl.url} using headers`);
+        return { success: true, changed: true, currentHash };
+      }
+
+      const changed = currentHash !== watchedUrl.last_content_hash;
+      console.log(`Header check for ${watchedUrl.url}: ${changed ? 'CHANGED' : 'no changes'}`);
+      return { success: true, changed, currentHash };
+
+    } catch (error) {
+      console.log(`HTTP header check failed for ${watchedUrl.url}:`, error.message);
+      return { success: false };
+    }
+  }
+
+  async checkRawHtmlHash(watchedUrl) {
+    try {
+      console.log(`Checking raw HTML hash for ${watchedUrl.url}`);
+      
+      const response = await fetch(watchedUrl.url, {
+        timeout: 15000 // 15 second timeout
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const rawHtml = await response.text();
+      
+      // Create hash of raw HTML (this is consistent across checks)
+      const currentHash = createHash('sha256')
+        .update(rawHtml)
+        .digest('hex');
+
+      // If no previous hash exists, consider it changed (first time)
+      if (!watchedUrl.last_content_hash) {
+        console.log(`First time check for ${watchedUrl.url} using HTML hash`);
+        return { changed: true, currentHash };
+      }
+
+      const changed = currentHash !== watchedUrl.last_content_hash;
+      console.log(`HTML hash check for ${watchedUrl.url}: ${changed ? 'CHANGED' : 'no changes'}`);
+      return { changed, currentHash };
+
+    } catch (error) {
+      console.error(`Raw HTML check failed for ${watchedUrl.url}:`, error.message);
+      return { changed: false, currentHash: watchedUrl.last_content_hash };
     }
   }
 
@@ -177,12 +238,16 @@ class UrlMonitor {
           file_path: `${jobId}-llms.txt`
         });
 
-        // Update content hash
-        if (result.data && result.data.llmsContent) {
-          const contentHash = createHash('sha256')
-            .update(result.data.llmsContent)
-            .digest('hex');
-          await db.updateContentHash(watchedUrl.id, contentHash);
+        // Update content hash using the same method as detection
+        // This ensures consistency between checks and regenerations
+        try {
+          const hashResult = await this.hasContentChanged(watchedUrl);
+          if (hashResult.currentHash) {
+            await db.updateContentHash(watchedUrl.id, hashResult.currentHash);
+            console.log(`Updated content hash for ${watchedUrl.url}`);
+          }
+        } catch (hashError) {
+          console.warn(`Failed to update content hash for ${watchedUrl.url}:`, hashError.message);
         }
 
         console.log(`Regeneration completed for ${watchedUrl.url}`);

@@ -263,7 +263,14 @@ const WatchedUrlCard = ({ url, onRemove, onRegenerate }) => {
       
       if (response.ok) {
         const content = await response.text();
-        const title = `${new URL(url.url).hostname} - ${endpoint}`;
+        const hostname = url.url ? (() => {
+          try {
+            return new URL(url.url).hostname;
+          } catch (e) {
+            return url.url || 'invalid-url';
+          }
+        })() : 'no-url';
+        const title = `${hostname} - ${endpoint}`;
         
         // Open in a new window/tab for viewing
         const newWindow = window.open('');
@@ -326,7 +333,13 @@ const WatchedUrlCard = ({ url, onRemove, onRegenerate }) => {
     <div className="url-card">
       <div className="url-header">
         <div className="url-info">
-          <h3 className="url-title">{new URL(url.url).hostname}</h3>
+          <h3 className="url-title">{url.url ? (() => {
+            try {
+              return new URL(url.url).hostname;
+            } catch (e) {
+              return url.url || 'Invalid URL';
+            }
+          })() : 'No URL'}</h3>
           <p className="url-link">{url.url}</p>
         </div>
         <div className="url-actions">
@@ -437,7 +450,14 @@ const AllGenerationsView = ({ generations, onDeleteGeneration }) => {
             <div key={generation.job_id} className="generation-card">
               <div className="generation-card-header">
                 <div className="generation-info">
-                  <h4>{new URL(generation.url || generation.watched_url || 'https://example.com').hostname}</h4>
+                  <h4>{(() => {
+                    try {
+                      const genUrl = generation.url || generation.watched_url || 'https://example.com';
+                      return new URL(genUrl).hostname;
+                    } catch (e) {
+                      return generation.url || generation.watched_url || 'Invalid URL';
+                    }
+                  })()}</h4>
                   <p className="generation-url">{generation.url || generation.watched_url}</p>
                 </div>
                 <button

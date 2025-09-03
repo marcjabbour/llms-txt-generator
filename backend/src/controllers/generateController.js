@@ -5,7 +5,9 @@ import websocket from '../services/websocket.js';
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
 
+dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const GENERATED_FILES_DIR = path.join(__dirname, '../../generated-files');
@@ -46,7 +48,7 @@ const handleGenerate = async (req, res) => {
       try {
         const existingUrl = await db.getWatchedUrlByUrl(url);
         if (!existingUrl || !existingUrl.is_active) {
-          const watchedUrl = await db.addWatchedUrl(url, 60); // Default 60 minute frequency
+          const watchedUrl = await db.addWatchedUrl(url, process.env.DEFAULT_CHECK_FREQUENCY_MINUTES || 10);
           console.log(`Immediately added ${url} to watch list for immediate display`);
           
           // Update the generation to link it to the watched URL
@@ -128,11 +130,24 @@ const handleGenerate = async (req, res) => {
           });
           
           // URL is already in watch list from when generation started
-          // Just ensure the generation is properly linked
+          // Just ensure the generation is properly linked and hash is initialized
           try {
             const existingUrl = await db.getWatchedUrlByUrl(url);
             if (existingUrl && existingUrl.is_active) {
               await db.updateGenerationWatchedUrl(jobId, existingUrl.id);
+              
+              // Initialize content hash for monitoring using the same method as monitor.js
+              // This ensures consistency between initial generation and future checks
+              try {
+                const monitor = await import('../services/monitor.js');
+                const hashResult = await monitor.default.hasContentChanged(existingUrl);
+                if (hashResult.currentHash) {
+                  await db.updateContentHash(existingUrl.id, hashResult.currentHash);
+                  console.log(`Initialized content hash for ${url}`);
+                }
+              } catch (hashError) {
+                console.warn(`Failed to initialize content hash for ${url}:`, hashError.message);
+              }
             }
           } catch (watchError) {
             console.warn('Failed to link generation to watched URL:', watchError);
