@@ -2,6 +2,11 @@
 
 A comprehensive web scraping solution that generates llms.txt files from websites with automatic monitoring and real-time updates.
 
+| Application Screens Preview |  |
+|--------|--------|
+| ![](assets/1.png) | ![](assets/2.png) |
+| ![](assets/3.png) | ![](assets/4.png) |
+
 ## Project Structure
 
 ```
