@@ -5,6 +5,7 @@ import { createHash } from 'crypto';
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { stableContentHash } from '../utils/htmlCleanup.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -188,11 +189,13 @@ class UrlMonitor {
       }
 
       const rawHtml = await response.text();
+
+      const currentHash = stableContentHash(rawHtml, { removeDates: false })
       
       // Create hash of raw HTML (this is consistent across checks)
-      const currentHash = createHash('sha256')
-        .update(rawHtml)
-        .digest('hex');
+      // const currentHash = createHash('sha256')
+      //   .update(rawHtml)
+      //   .digest('hex');
 
       // If no previous hash exists, consider it changed (first time)
       if (!watchedUrl.last_content_hash) {

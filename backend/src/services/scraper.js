@@ -60,7 +60,7 @@ class Scraper {
         }
       ],
       requestHandler: async ({ request, page, enqueueLinks, log }) => {
-        log.info(`Processing: ${request.url}`);
+        // log.info(`Processing: ${request.url}`);
         
         // Skip binary/download files early
         if (/\.(pdf|zip|gz|rar|7z|jpg|jpeg|png|gif|webp|svg|ico|mp4|mov|avi|mp3|wav|xlsx|xls|doc|docx|ppt|pptx|exe|dmg|pkg)$/i.test(request.url)) {
@@ -220,7 +220,7 @@ class Scraper {
                 }
                 
                 req.userData = { ...(req.userData || {}), depth: depth + 1 };
-                log.info(`Enqueueing link: ${req.url} (depth ${depth + 1})`);
+                // log.info(`Enqueueing link: ${req.url} (depth ${depth + 1})`);
                 return req;
               } catch (error) {
                 log.error(`Error processing link ${req.url}:`, error);
