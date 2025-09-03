@@ -3,6 +3,13 @@ import { randomUUID } from 'crypto';
 import db from '../database/db.js';
 import { validateUrl } from '../utils/validation.js';
 import scraper from '../services/scraper.js';
+import fs from 'fs/promises';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const GENERATED_FILES_DIR = path.join(__dirname, '../../generated-files');
 
 const router = express.Router();
 
@@ -153,8 +160,24 @@ router.post('/:id/regenerate', async (req, res) => {
         
         const result = await scraper.scrape(watchedUrl.url);
         
+        // Save file to disk
+        if (result.data && result.data.llmsContent) {
+          try {
+            const llmsFilePath = path.join(GENERATED_FILES_DIR, `${jobId}-llms.txt`);
+            
+            // Ensure directory exists
+            await fs.mkdir(GENERATED_FILES_DIR, { recursive: true });
+            
+            // Write the file
+            await fs.writeFile(llmsFilePath, result.data.llmsContent, 'utf8');
+            console.log(`Regenerated file saved successfully: ${llmsFilePath}`);
+          } catch (fileError) {
+            console.error('Error saving regenerated file to disk:', fileError);
+          }
+        }
+        
         await db.updateGenerationStatus(jobId, 'completed', {
-          file_path: `generated/${jobId}.txt`
+          file_path: `${jobId}-llms.txt`
         });
 
         // Update content hash for change detection

@@ -59,21 +59,16 @@ const WatchedUrlsDashboard = () => {
 
       // Listen for updates
       websocketService.onWatchedUrlsUpdate((data) => {
+        console.log('Watched URLs update received:', data);
         setWatchedUrls(data.data);
       });
 
       websocketService.onGenerationUpdate((data) => {
         console.log('Generation update received:', data);
         
-        // Update specific generation in the watched URLs list
-        setWatchedUrls(prevUrls => {
-          return prevUrls.map(url => ({
-            ...url,
-            recentGenerations: url.recentGenerations.map(gen => 
-              gen.job_id === data.data.job_id ? { ...gen, ...data.data } : gen
-            )
-          }));
-        });
+        // Refresh the watched URLs list to ensure we have the latest data
+        // This will show the new card immediately when generation starts
+        loadWatchedUrls();
         
         // Also update the all generations list
         setAllGenerations(prevGens => {

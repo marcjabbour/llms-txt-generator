@@ -42,6 +42,26 @@ const handleGenerate = async (req, res) => {
         trigger: 'manual'
       });
       
+      // Immediately add URL to watch list so it appears in dashboard
+      try {
+        const existingUrl = await db.getWatchedUrlByUrl(url);
+        if (!existingUrl || !existingUrl.is_active) {
+          const watchedUrl = await db.addWatchedUrl(url, 60); // Default 60 minute frequency
+          console.log(`Immediately added ${url} to watch list for immediate display`);
+          
+          // Update the generation to link it to the watched URL
+          await db.updateGenerationWatchedUrl(jobId, watchedUrl.id);
+          
+          // Notify WebSocket clients about the new watched URL
+          websocket.notifyWatchedUrlAdded();
+        } else if (existingUrl.is_active) {
+          // URL already exists, just link the generation to it
+          await db.updateGenerationWatchedUrl(jobId, existingUrl.id);
+        }
+      } catch (watchError) {
+        console.warn('Failed to add URL to watch list immediately:', watchError);
+      }
+      
       // Notify WebSocket clients about new generation
       websocket.notifyGenerationUpdate(jobId, 'pending');
     } catch (dbError) {
@@ -107,18 +127,15 @@ const handleGenerate = async (req, res) => {
             file_path: `${jobId}`
           });
           
-          // Automatically add URL to watch list if not already being watched
+          // URL is already in watch list from when generation started
+          // Just ensure the generation is properly linked
           try {
             const existingUrl = await db.getWatchedUrlByUrl(url);
-            if (!existingUrl || !existingUrl.is_active) {
-              const watchedUrl = await db.addWatchedUrl(url, 60); // Default 60 minute frequency
-              console.log(`Automatically added ${url} to watch list`);
-              
-              // Update the generation to link it to the watched URL
-              await db.updateGenerationWatchedUrl(jobId, watchedUrl.id);
+            if (existingUrl && existingUrl.is_active) {
+              await db.updateGenerationWatchedUrl(jobId, existingUrl.id);
             }
           } catch (watchError) {
-            console.warn('Failed to auto-add URL to watch list:', watchError);
+            console.warn('Failed to link generation to watched URL:', watchError);
           }
           
           // Notify WebSocket clients

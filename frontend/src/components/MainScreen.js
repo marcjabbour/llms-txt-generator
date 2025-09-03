@@ -22,7 +22,7 @@ const MainScreen = ({ isBackendHealthy }) => {
       const domain = new URL(url).hostname;
       alert(`Initiating Generation for ${domain}, check status in Dashboard`);
       
-      // Navigate to dashboard immediately to show the in-progress generation
+      // Navigate to dashboard immediately - the WebSocket will update it with the new URL
       navigate('/dashboard');
       
       // Don't wait for completion - let the dashboard handle live updates via WebSocket
