@@ -30,9 +30,25 @@ class ScrapingService {
 
   async download(jobId, type = 'llms') {
     const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:3001';
-    const url = `${API_BASE_URL}/api/generate/download/${jobId}/llms.txt`;
+    const endpoint = type === 'full' ? 'llms-full.txt' : 'llms.txt';
+    const url = `${API_BASE_URL}/api/generate/download/${jobId}/${endpoint}`;
+    
     const response = await fetch(url);
-    if (!response.ok) throw new Error(`Download failed: ${response.statusText}`);
+    
+    if (!response.ok) {
+      // Try to get error details from response
+      try {
+        const errorData = await response.json();
+        if (response.status === 410 && errorData.canRegenerate) {
+          // Special case for content no longer available
+          throw new Error(errorData.error);
+        }
+        throw new Error(errorData.error || `Download failed: ${response.statusText}`);
+      } catch (parseError) {
+        // If we can't parse JSON, use status text
+        throw new Error(`Download failed: ${response.statusText}`);
+      }
+    }
     
     const blob = await response.blob();
     const downloadUrl = window.URL.createObjectURL(blob);
@@ -41,6 +57,14 @@ class ScrapingService {
     a.download = response.headers.get('Content-Disposition')?.split('filename=')[1]?.replace(/"/g, '') || 'llms.txt';
     a.click();
     window.URL.revokeObjectURL(downloadUrl);
+  }
+
+  async deleteGeneration(jobId) {
+    return await ApiService.delete(`/api/generate/${jobId}`);
+  }
+
+  async getAllGenerations(limit = 50) {
+    return await ApiService.get(`/api/generate/all?limit=${limit}`);
   }
 
   async healthCheck() {

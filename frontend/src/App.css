@@ -106,13 +106,23 @@
   font-size: 0.875rem;
 }
 
+.action-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.action-buttons.centered {
+  justify-content: center;
+  grid-template-columns: auto;
+}
+
 .view-files-btn {
-  width: 100%;
   background-color: #f8fafc;
   color: #475569;
   border: 2px solid #e2e8f0;
-  padding: 0.875rem 1.5rem;
-  font-size: 1rem;
+  padding: 0.875rem 1rem;
+  font-size: 0.95rem;
   font-weight: 600;
   border-radius: 8px;
   cursor: pointer;
@@ -124,6 +134,23 @@
   border-color: #cbd5e1;
 }
 
+.main-screen .dashboard-btn {
+  background-color: #8b5cf6;
+  color: white;
+  border: 2px solid #8b5cf6;
+  padding: 0.875rem 1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.main-screen .dashboard-btn:hover {
+  background-color: #7c3aed;
+  border-color: #7c3aed;
+}
+
 /* Generated Files Styles */
 .generated-files {
   min-height: 100vh;
@@ -133,6 +160,7 @@
 .header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   margin-bottom: 2rem;
   gap: 1rem;
 }
@@ -206,11 +234,46 @@
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
+.file-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.file-title-section {
+  flex: 1;
+  min-width: 0;
+}
+
 .file-info h3 {
   font-size: 1.25rem;
   font-weight: 600;
   color: #1e293b;
   margin-bottom: 0.5rem;
+}
+
+.delete-file-btn {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  border-radius: 6px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 1rem;
+  flex-shrink: 0;
+  margin-left: 12px;
+}
+
+.delete-file-btn:hover {
+  background: #fee2e2;
+  border-color: #feb2b2;
+  transform: scale(1.05);
 }
 
 .file-url {
@@ -226,6 +289,13 @@
   margin-bottom: 1rem;
 }
 
+.status-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
 .status {
   display: inline-block;
   padding: 0.25rem 0.5rem;
@@ -233,7 +303,19 @@
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
-  margin-bottom: 1rem;
+}
+
+.watching-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: #dbeafe;
+  color: #1d4ed8;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid #bfdbfe;
 }
 
 .status.completed {
@@ -297,6 +379,71 @@
   border-color: #2563eb;
 }
 
+.dashboard-btn {
+  background-color: #8b5cf6;
+  color: white;
+  border: none;
+  padding: 0.875rem 1.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  white-space: nowrap;
+}
+
+.dashboard-btn:hover {
+  background-color: #7c3aed;
+}
+
+.watch-section {
+  border-top: 1px solid #e2e8f0;
+  padding-top: 1rem;
+  margin-top: 0.5rem;
+}
+
+.watch-btn {
+  width: 100%;
+  background-color: #10b981;
+  color: white;
+  border: none;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.watch-btn:hover {
+  background-color: #059669;
+}
+
+.stop-watch-btn {
+  width: 100%;
+  background-color: #dc2626;
+  color: white;
+  border: none;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.stop-watch-btn:hover {
+  background-color: #b91c1c;
+}
+
 /* Error and Loading States */
 .error-banner {
   background-color: #fef2f2;
@@ -351,11 +498,20 @@
     padding: 2rem;
   }
   
+  .action-buttons {
+    grid-template-columns: 1fr;
+  }
+  
   .files-grid {
     grid-template-columns: 1fr;
   }
   
   .container {
     padding: 1rem;
+  }
+  
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }

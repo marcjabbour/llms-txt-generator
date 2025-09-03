@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import scrapingService from '../services/scrapingService';
+import watchService from '../services/watchService';
 
 const MainScreen = ({ isBackendHealthy }) => {
   const [url, setUrl] = useState('');
@@ -16,22 +17,15 @@ const MainScreen = ({ isBackendHealthy }) => {
 
     try {
       const jobResponse = await scrapingService.generate(url);
-      const result = await scrapingService.waitForCompletion(
-        jobResponse.jobId,
-        (status) => console.log('Status:', status.status)
-      );
-
-      console.log('Generation completed:', result);
-      navigate('/generated-files', { 
-        state: { 
-          newFile: {
-            id: result.id,
-            url: result.url,
-            result: result.result,
-            completedAt: result.completedAt
-          }
-        }
-      });
+      
+      // Show immediate success message
+      const domain = new URL(url).hostname;
+      alert(`Initiating Generation for ${domain}, check status in Dashboard`);
+      
+      // Navigate to dashboard immediately to show the in-progress generation
+      navigate('/dashboard');
+      
+      // Don't wait for completion - let the dashboard handle live updates via WebSocket
     } catch (err) {
       setError(err.message || 'Failed to generate content');
       console.error('Generation failed:', err);
@@ -40,8 +34,8 @@ const MainScreen = ({ isBackendHealthy }) => {
     }
   };
 
-  const handleViewFiles = () => {
-    navigate('/generated-files');
+  const handleViewDashboard = () => {
+    navigate('/dashboard');
   };
 
   return (
@@ -84,12 +78,14 @@ const MainScreen = ({ isBackendHealthy }) => {
           <span>or</span>
         </div>
 
-        <button 
-          onClick={handleViewFiles}
-          className="view-files-btn"
-        >
-          View Generated Files
-        </button>
+        <div className="action-buttons centered">
+          <button 
+            onClick={handleViewDashboard}
+            className="dashboard-btn"
+          >
+            📊 Dashboard
+          </button>
+        </div>
       </div>
     </div>
   );
